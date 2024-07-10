@@ -21,7 +21,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
     public async Task<EmploymentsResponse> SearchEmployments([ActionParameter] SearchEmploymentsRequest request)
     {
         var allEmployments = new List<EmploymentResponse>();
-        int currentPage = 1;
+        var currentPage = 1;
         EmploymentsResponse employmentsResponse;
 
         do
@@ -100,7 +100,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             body.Add("personal_email", employmentDto.PersonalEmail);
         }
         
-        var apiRequest = new ApiRequest($"/v1/employments/{employmentDto.EmploymentId}", Method.Put, Creds)
+        var apiRequest = new ApiRequest($"/v1/employments/{employmentDto.EmploymentId}", Method.Patch, Creds)
             .WithJsonBody(body);
         
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
