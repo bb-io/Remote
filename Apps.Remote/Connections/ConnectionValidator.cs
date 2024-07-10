@@ -16,9 +16,7 @@ public class ConnectionValidator: IConnectionValidator
         
         try
         {
-            await apiClient.ExecuteAsync(new ApiRequest("/v1/employments", Method.Get, credentialsProviders),
-                cancellationToken);
-            
+            await apiClient.ExecuteWithErrorHandling(new ApiRequest("/v1/employments", Method.Get, credentialsProviders));
             return new ConnectionValidationResponse
             {
                 IsValid = true

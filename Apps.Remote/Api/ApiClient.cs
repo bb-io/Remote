@@ -2,6 +2,7 @@ using Apps.Remote.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Utils.RestSharp;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Apps.Remote.Api;
@@ -14,58 +15,36 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
-        return new($"Status code: {response.StatusCode}, Content: {response.Content}");
-    }
-}
-
-/*
-public async Task<T> ExecuteWithJson<T>(string endpoint, Method method, object? body, IEnumerable<AuthenticationCredentialsProvider> credentials)
-    {
-        var response = await Execute(endpoint, method, body, credentials.ToList());
-        var result = JsonConvert.DeserializeObject<T>(response.Content!)!;
-        return result;
+        return ConfigureException(response);
     }
     
-    public async Task Execute(string endpoint, Method method, object? body, IEnumerable<AuthenticationCredentialsProvider> credentials)
+    public Exception ConfigureException(RestResponse response)
     {
-        await Execute(endpoint, method, body, credentials.ToList());
-    }
+        string errorMessage = $"Status code: {response.StatusCode}, ";
 
-    public async Task<RestResponse> Execute(string endpoint, Method method, object? bodyObj, List<AuthenticationCredentialsProvider> creds)
-    {
-        var baseUri = creds.GetUrl();
-        RestRequest request = new ApiRequest(new()
+        try
         {
-            Url = baseUri + endpoint,
-            Method = method
-        }, creds);
+            var responseObject = JsonConvert.DeserializeObject<JObject>(response.Content!)!;
 
-        if (bodyObj != null)
-        {
-            request.WithJsonBody(bodyObj, new()
+            if (responseObject["message"] is JObject messageObject)
             {
-                ContractResolver = new DefaultContractResolver()
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy()
-                },
-                NullValueHandling = NullValueHandling.Ignore
-            });        
+                var code = messageObject["code"]?.ToString();
+                var message = messageObject["message"]?.ToString();
+                var param = messageObject["param"]?.ToString();
+            
+                errorMessage += $"Error code: {code}, Message: {message}, Parameter: {param}";
+            }
+            else
+            {
+                var message = responseObject["message"]?.ToString();
+                errorMessage += $"Message: {message}";
+            }
+        }
+        catch (JsonException)
+        {
+            errorMessage += $"Content: {response.Content}";
         }
 
-        return await ExecuteRequest(request);
+        return new Exception(errorMessage);
     }
-    
-    private async Task<RestResponse> ExecuteRequest(RestRequest request)
-    {
-        var response = await ExecuteAsync(request);
-        if (!response.IsSuccessStatusCode)
-            throw GetError(response);
-
-        return response;
-    }
-    
-    private static Exception GetError(RestResponse response)
-    {
-        return new($"Status code: {response.StatusCode}, Content: {response.Content}");
-    }
- */
+}
