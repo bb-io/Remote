@@ -10,14 +10,16 @@ public class CreateInvoiceScheduleRequest : EmploymentIdentifier
     [Display("Currency", Description = "Currency code in ISO 4217 format"), StaticDataSource(typeof(CurrencyDataSource))]
     public string Currency { get; set; } = string.Empty;
     
-    [Display("Start date")]
+    [Display("Start date", Description = "Date of the first contractor invoice generation")]
     public DateTime StartDate { get; set; }
     
-    [StaticDataSource(typeof(PeriodicityDataSource))]
+    [Display("Periodicity", Description = "Defines how often contractor invoices will be generate"), StaticDataSource(typeof(PeriodicityDataSource))]
     public string Periodicity { get; set; } = string.Empty;
 
+    [Display("Amounts", Description = "List of amounts that will be used to generate invoices")]
     public List<double> Amounts { get; set; } = new();
     
+    [Display("Descriptions", Description = "List of descriptions that will be used to generate invoices")]
     public List<string> Descriptions { get; set; } = new();
     
     [Display("Note", Description = "Custom defined note")]

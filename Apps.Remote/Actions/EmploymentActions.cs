@@ -57,24 +57,38 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
     }
     
     [Action("Create employment", Description = "Create employment with specified data")]
-    public async Task<EmploymentResponse> CreateEmployment([ActionParameter] CreateEmploymentRequest employmentDto)
+    public async Task<EmploymentResponse> CreateEmployment([ActionParameter] CreateEmploymentRequest request)
     {
-        var hasSeniorityDate = employmentDto.HasSeniorityDate ?? false;
+        var hasSeniorityDate = request.SeniorityDate.HasValue;
+        var body = new Dictionary<string, object>()
+        {
+            { "country_code", request.CountryCode },
+            { "type", request.Type ?? "employee" }
+        };
+
+        if (!string.IsNullOrEmpty(request.CompanyId))
+        {
+            body.Add("company_id", request.CompanyId);
+        }
+        
+        var basicInformation = new Dictionary<string, object>
+        {
+            { "email", request.Email },
+            { "job_title", request.JobTitle },
+            { "name", request.Name },
+            { "provisional_start_date", request.ProvisionalStartDate.ToString("yyyy-MM-dd") },
+            { "has_seniority_date", hasSeniorityDate ? "yes" : "no" }
+        };
+        
+        if (hasSeniorityDate)
+        {
+            basicInformation.Add("seniority_date", request.SeniorityDate!.Value.ToString("yyyy-MM-dd"));
+        }
+        
+        body.Add("basic_information", basicInformation);
+        
         var apiRequest = new ApiRequest("/v1/employments", Method.Post, Creds)
-            .WithJsonBody(new
-            {
-                basic_information = new
-                {
-                    email = employmentDto.Email,
-                    has_seniority_date = hasSeniorityDate ? "yes" : "no",
-                    job_title = employmentDto.JobTitle,
-                    name = employmentDto.Name,
-                    provisional_start_date = employmentDto.ProvisionalStartDate
-                },
-                country_code = employmentDto.CountryCode,
-                company_id = employmentDto.CompanyId,
-                type = employmentDto.Type
-            });
+            .WithJsonBody(body);
         
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
         return response.Data?.Employment!;

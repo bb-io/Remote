@@ -80,9 +80,9 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
                         amount = amount.ToString(CultureInfo.InvariantCulture),
                         description = request.Descriptions.ElementAtOrDefault(index)
                     }),
-                    note = request.Note,
-                    nr_occurrences = request.NrOccurrences,
-                    number = request.Number
+                    note = request.Note ?? string.Empty,
+                    nr_occurrences = request.NrOccurrences.HasValue ? request.NrOccurrences.Value.ToString() : "1",
+                    number = request.Number ?? "1"
                 }
             }
         };
