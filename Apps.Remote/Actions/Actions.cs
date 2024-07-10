@@ -1,8 +1,8 @@
-using Apps.App.Invocables;
+using Apps.Remote.Invocables;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
-namespace Apps.App.Actions;
+namespace Apps.Remote.Actions;
 
 [ActionList]
 public class Actions : AppInvocable

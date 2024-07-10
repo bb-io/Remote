@@ -1,18 +1,14 @@
-using Apps.App.Api;
+using Apps.Remote.Api;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
-namespace Apps.App.Invocables;
+namespace Apps.Remote.Invocables;
 
-public class AppInvocable : BaseInvocable
+public class AppInvocable(InvocationContext invocationContext) : BaseInvocable(invocationContext)
 {
     protected AuthenticationCredentialsProvider[] Creds =>
         InvocationContext.AuthenticationCredentialsProviders.ToArray();
 
-    protected AppClient Client { get; }
-    public AppInvocable(InvocationContext invocationContext) : base(invocationContext)
-    {
-        Client = new();
-    }
+    protected ApiClient Client { get; } = new(invocationContext.AuthenticationCredentialsProviders);
 }
