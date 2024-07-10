@@ -33,6 +33,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
 
             if (invoiceSchedulesResponse.InvoiceSchedules != null)
             {
+                invoiceSchedulesResponse.InvoiceSchedules.ForEach(x => x.SetItemAmountsAndDescriptions());
                 allInvoiceSchedules.AddRange(invoiceSchedulesResponse.InvoiceSchedules);
             }
 
@@ -53,6 +54,8 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
     {
         var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{identifier.InvoiceScheduleId}", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
+        
+        response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
         return response.Data!.InvoiceSchedule;
     }
     
@@ -88,6 +91,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
             .WithJsonBody(body);
         
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
+        response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
         return response.Data!.InvoiceSchedule;
     }
     
@@ -119,6 +123,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
             .WithJsonBody(body);
         
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
+        response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
         return response.Data!.InvoiceSchedule;
     }
 

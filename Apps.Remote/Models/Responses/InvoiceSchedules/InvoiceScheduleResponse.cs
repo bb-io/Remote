@@ -17,6 +17,12 @@ public class InvoiceScheduleResponse
     [JsonProperty("items")]
     public List<InvoiceItem> Items { get; set; } = new();
 
+    [Display("Item amounts")]
+    public List<double> ItemAmounts { get; set; } = new();
+    
+    [Display("Item descriptions")] 
+    public List<string> ItemDescriptions { get; set; } = new();
+
     [JsonProperty("currency")]
     public string Currency { get; set; } = string.Empty;
 
@@ -40,6 +46,12 @@ public class InvoiceScheduleResponse
 
     [JsonProperty("periodicity")]
     public string Periodicity { get; set; } = string.Empty;
+    
+    public void SetItemAmountsAndDescriptions()
+    {
+        ItemAmounts = Items.Select(x => (double)x.Amount).ToList();
+        ItemDescriptions = Items.Select(x => x.Description).ToList();
+    }
 }
 
 public class InvoiceItem
