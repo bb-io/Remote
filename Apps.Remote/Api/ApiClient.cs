@@ -1,3 +1,5 @@
+using Apps.Remote.Models.Dtos;
+using Apps.Remote.Models.Responses.InvoiceSchedules;
 using Apps.Remote.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Utils.RestSharp;
@@ -8,7 +10,7 @@ using RestSharp;
 namespace Apps.Remote.Api;
 
 public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
-    : BlackBirdRestClient(new RestClientOptions { BaseUrl = creds.GetUrl(), ThrowOnAnyError = true })
+    : BlackBirdRestClient(new RestClientOptions { BaseUrl = creds.GetUrl(), ThrowOnAnyError = false })
 {
     protected override JsonSerializerSettings JsonSettings => 
         new() { MissingMemberHandling = MissingMemberHandling.Ignore };

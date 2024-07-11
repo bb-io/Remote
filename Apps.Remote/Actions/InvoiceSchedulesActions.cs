@@ -94,7 +94,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                     periodicity = request.Periodicity,
                     items = request.Amounts.Select((amount, index) => new
                     {
-                        amount = amount.ToString(CultureInfo.InvariantCulture),
+                        amount = (int)amount,
                         description = request.Descriptions.ElementAtOrDefault(index)
                     }),
                     note = request.Note ?? string.Empty,
@@ -103,12 +103,30 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                 }
             }
         };
+
+        var json = JsonConvert.SerializeObject(body);
         
         var apiRequest = new ApiRequest("/v1/contractor-invoice-schedules", Method.Post, Creds)
             .WithJsonBody(body);
         
-        var response = await Client.ExecuteWithErrorHandling<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
-        var invoice = response.Data!.InvoiceScheduleResponses.FirstOrDefault() ?? throw new Exception("Invoice schedule returned unexpected response.");
+        var response = await Client.ExecuteAsync<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
+        var content = response.Content!;
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            if(response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+            {
+                var data = JsonConvert.DeserializeObject<BaseDto<CreatedInvoiceScheduleDto>>(content)!;
+                var errors = data.Data!.ToString();
+
+                throw new Exception(errors);
+            }
+
+            throw new Exception(response.ErrorMessage ?? response.Content);
+        }
+
+        var invoiceScheduleResponses = JsonConvert.DeserializeObject<BaseDto<CreatedInvoiceScheduleDto>>(content)!;
+        var invoice = invoiceScheduleResponses.Data!.InvoiceScheduleResponses.FirstOrDefault() ?? throw new Exception("Invoice schedule returned unexpected response.");
         invoice.SetItemAmountsAndDescriptions();
         return invoice;
     }
