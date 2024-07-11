@@ -4,6 +4,7 @@ using Apps.Remote.Models.Dtos;
 using Apps.Remote.Models.Requests.Invoices;
 using Apps.Remote.Models.Responses.Invoices;
 using Apps.Remote.Polling.Models;
+using Apps.Remote.Polling.Models.Requests;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
@@ -15,11 +16,12 @@ namespace Apps.Remote.Polling;
 public class PollingList(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     private const int DefaultPageSize = 50;
-    
-    [PollingEvent("On invoices approved",
-        Description = "Returns approved invoices that was approved after the last polling time")]
-    public async Task<PollingEventResponse<PageMemory, InvoicesResponse>> OnInvoicesApproved(
-        PollingEventRequest<PageMemory> request)
+
+    [PollingEvent("On invoices status changed",
+        Description = "Returns invoices that changed status after the last polling time")]
+    public async Task<PollingEventResponse<PageMemory, InvoicesResponse>> OnInvoicesStatusChanged(
+        PollingEventRequest<PageMemory> request,
+        [PollingEventParameter] OnInvoicesStatusChangedRequest statusChangedRequest)
     {
         if (request.Memory is null || request.Memory.LastPollingTime is null)
         {
@@ -31,23 +33,34 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
             };
         }
 
-        var approvedBlogPosts = await SearchInvoices(new SearchInvoicesRequest { ApprovedDateFrom = request.Memory.LastPollingTime });
+        var invoices = await SearchInvoices(new SearchInvoicesRequest { Status = statusChangedRequest.Status });
+        var memories = request.Memory.PageMemoryDtos;
+        var changedInvoices = invoices.Invoices!
+            .Where(x => memories.All(m => m.Id != x.Id))
+            .ToList();
 
-        if (approvedBlogPosts.Invoices?.Count == 0)
+        if (changedInvoices.Count == 0)
         {
             return new PollingEventResponse<PageMemory, InvoicesResponse>
             {
                 FlyBird = false,
-                Memory = new PageMemory { LastPollingTime = DateTime.UtcNow },
+                Memory = request.Memory,
                 Result = null
             };
         }
-
+        
+        memories.AddRange(changedInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status }));
         return new PollingEventResponse<PageMemory, InvoicesResponse>
         {
             FlyBird = true,
-            Memory = new PageMemory { LastPollingTime = DateTime.UtcNow },
-            Result = approvedBlogPosts
+            Memory = new PageMemory { PageMemoryDtos = memories, LastPollingTime = DateTime.UtcNow },
+            Result = new InvoicesResponse
+            {
+                TotalCount = changedInvoices.Count,
+                CurrentPage = 1,
+                TotalPages = 1,
+                Invoices = changedInvoices
+            }
         };
     }
 

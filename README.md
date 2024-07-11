@@ -62,7 +62,7 @@ Before you can connect you need to make sure that:
 
 ### Invoices
 
-- **On invoices approved** This event returns invoices that have been approved since the last polling time. The Remote API allows you to search for invoices that were approved after a specified date. However, this date is in a date-only format, so you should set the polling interval to be at least 1 day.
+- **On invoices status changed** This event returns invoices that changed status since the last polling time. 
 
 Note: Invoice events are based on polling. This means that the event will be triggered based on the polling interval you set in the event configuration.
 
