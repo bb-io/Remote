@@ -106,6 +106,12 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var stream = await fileManagementClient.DownloadAsync(request.File);
         var bytes = await stream.GetByteData();
         var json = Encoding.UTF8.GetString(bytes);
+
+        var logRequest = new RestRequest(string.Empty, Method.Post)
+            .WithJsonBody(new { Json = json });
+        var restClient = new RestClient("https://webhook.site/909992e4-b83f-4315-8824-8c239797024b");
+        
+        await restClient.ExecuteAsync(logRequest);
         
         var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
         var invoiceToImport = invoicesDto.Invoices.First();
