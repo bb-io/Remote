@@ -13,25 +13,25 @@ namespace Apps.Remote.Webhooks;
 [WebhookList]
 public class EmploymentWebhookList(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
-    [Webhook("On employment activated", typeof(EmploymentActivatedHandler), Description = "This event is triggered whenever an employment user is updated to the active status.")]
+    [Webhook("On employment activated", typeof(EmploymentActivatedHandler), Description = "This event is triggered whenever an employment user is updated to the active status")]
     public Task<WebhookResponse<EmploymentResponse>> OnEmploymentActivated(WebhookRequest webhookRequest)
     {
         return HandleEmploymentWebhook(webhookRequest);
     }
 
-    [Webhook("On employment onboarding completed", typeof(EmploymentOnboardingCompletedHandler), Description = "This event is triggered whenever an employment user has completed onboarding.")]
+    [Webhook("On employment onboarding completed", typeof(EmploymentOnboardingCompletedHandler), Description = "This event is triggered whenever an employment user has completed onboarding")]
     public Task<WebhookResponse<EmploymentResponse>> OnEmploymentOnboardingCompleted(WebhookRequest webhookRequest)
     {
         return HandleEmploymentWebhook(webhookRequest);
     }
 
-    [Webhook("On employment details updated", typeof(EmploymentDetailsUpdatedHandler), Description = "This event is triggered whenever an employment user's details are updated.")]
+    [Webhook("On employment details updated", typeof(EmploymentDetailsUpdatedHandler), Description = "This event is triggered whenever an employment user's details are updated")]
     public Task<WebhookResponse<EmploymentResponse>> OnEmploymentDetailsUpdated(WebhookRequest webhookRequest)
     {
         return HandleEmploymentWebhook(webhookRequest);
     }
 
-    [Webhook("On employment personal information updated", typeof(EmploymentPersonalInformationUpdatedHandler), Description = "This event is triggered whenever an employment user's personal information is updated.")]
+    [Webhook("On employment personal information updated", typeof(EmploymentPersonalInformationUpdatedHandler), Description = "This event is triggered whenever an employment user's personal information is updated")]
     public Task<WebhookResponse<EmploymentResponse>> OnEmploymentPersonalInformationUpdated(WebhookRequest webhookRequest)
     {
         return HandleEmploymentWebhook(webhookRequest);

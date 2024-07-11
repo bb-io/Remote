@@ -27,10 +27,10 @@ public class SearchInvoicesRequest
     [Display("Due date to"), JsonProperty("due_date_to")]
     public DateTime? DueDateTo { get; set; }
 
-    [Display("Approved date from"), JsonProperty("approved_date_from")]
+    [Display("Approved date from", Description = "Filters contractor invoices by approved date greater than or equal to the value"), JsonProperty("approved_date_from")]
     public DateTime? ApprovedDateFrom { get; set; }
 
-    [Display("Approved date to"), JsonProperty("approved_date_to")]
+    [Display("Approved date to", Description = "Filters contractor invoices by approved date less than or equal to the value."), JsonProperty("approved_date_to")]
     public DateTime? ApprovedDateTo { get; set; }
 
     [Display("Paid out date from"), JsonProperty("paid_out_date_from")]

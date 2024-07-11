@@ -59,7 +59,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
         return response.Data!.InvoiceSchedule;
     }
     
-    [Action("Create invoice schedule", Description = "Create new invoice schedule")]
+    [Action("Create invoice schedule", Description = "Create invoice schedule with specified data.")]
     public async Task<InvoiceScheduleResponse> CreateInvoiceSchedule([ActionParameter] CreateInvoiceScheduleRequest request)
     {
         if(request.Amounts.Count != request.Descriptions.Count)
@@ -95,7 +95,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
         return response.Data!.InvoiceSchedule;
     }
     
-    [Action("Update invoice schedule", Description = "Update existing invoice schedule")]
+    [Action("Update invoice schedule", Description = "Update invoice schedule by ID with specified data")]
     public async Task<InvoiceScheduleResponse> UpdateInvoiceSchedule([ActionParameter] UpdateInvoiceScheduleRequest request)
     {
         if (request.Amounts?.Count != request.Descriptions?.Count)

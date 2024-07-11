@@ -121,7 +121,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         return response.Data?.Employment!;
     }
     
-    [Action("Invite employment", Description = "Invite employment by ID")]
+    [Action("Invite employment", Description = "Invite employment by ID to start the self-enrollment")]
     public async Task InviteEmployment([ActionParameter] EmploymentIdentifier identifier)
     {
         var apiRequest = new ApiRequest($"/v1/employments/{identifier.EmploymentId}/invite", Method.Post, Creds);
