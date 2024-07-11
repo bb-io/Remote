@@ -133,46 +133,46 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
 
         if (request.StartDateFrom.HasValue)
         {
-            apiRequest.AddParameter("start_date_from", request.StartDateFrom.Value.ToString("yyyy-MM-dd"));
+            apiRequest.AddParameter("start_date_from", request.StartDateFrom.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.StartDateTo.HasValue)
         {
-            apiRequest.AddParameter("start_date_to", request.StartDateTo.Value.ToString("yyyy-MM-dd"));
+            apiRequest.AddParameter("start_date_to", request.StartDateTo.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.NextInvoiceDateFrom.HasValue)
         {
-            apiRequest.AddParameter("next_invoice_date_from", request.NextInvoiceDateFrom.Value.ToString("yyyy-MM-dd"));
+            apiRequest.AddParameter("next_invoice_date_from", request.NextInvoiceDateFrom.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.NextInvoiceDateTo.HasValue)
         {
-            apiRequest.AddParameter("next_invoice_date_to", request.NextInvoiceDateTo.Value.ToString("yyyy-MM-dd"));
+            apiRequest.AddParameter("next_invoice_date_to", request.NextInvoiceDateTo.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Status))
         {
-            apiRequest.AddParameter("status", request.Status);
+            apiRequest.AddParameter("status", request.Status, ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.EmploymentId))
         {
-            apiRequest.AddParameter("employment_id", request.EmploymentId);
+            apiRequest.AddParameter("employment_id", request.EmploymentId, ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Periodicity))
         {
-            apiRequest.AddParameter("periodicity", request.Periodicity);
+            apiRequest.AddParameter("periodicity", request.Periodicity, ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Currency))
         {
-            apiRequest.AddParameter("currency", request.Currency);
+            apiRequest.AddParameter("currency", request.Currency, ParameterType.QueryString);
         }
 
-        apiRequest.AddParameter("page", currentPage);
-        apiRequest.AddParameter("page_size", pageSize);
+        apiRequest.AddParameter("page", currentPage, ParameterType.QueryString);
+        apiRequest.AddParameter("page_size", pageSize, ParameterType.QueryString);
 
         return apiRequest;
     }

@@ -134,21 +134,21 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
 
         if (!string.IsNullOrEmpty(request.CompanyId))
         {
-            apiRequest.AddParameter("company_id", request.CompanyId);
+            apiRequest.AddParameter("company_id", request.CompanyId, ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Email))
         {
-            apiRequest.AddParameter("email", request.Email);
+            apiRequest.AddParameter("email", request.Email, ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Status))
         {
-            apiRequest.AddParameter("status", request.Status);
+            apiRequest.AddParameter("status", request.Status, ParameterType.QueryString);
         }
 
-        apiRequest.AddParameter("page", currentPage);
-        apiRequest.AddParameter("page_size", pageSize);
+        apiRequest.AddParameter("page", currentPage, ParameterType.QueryString);
+        apiRequest.AddParameter("page_size", pageSize, ParameterType.QueryString);
 
         return apiRequest;
     }

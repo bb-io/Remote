@@ -91,7 +91,7 @@ public class InvoiceActions(InvocationContext invocationContext) : AppInvocable(
 
         if (request.ApprovedDateFrom.HasValue)
         {
-            apiRequest.AddParameter("approved_date_from", request.ApprovedDateFrom.Value.ToString("yyyy-MM-dd"));
+            apiRequest.AddParameter("approved_date_from", request.ApprovedDateFrom.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.ApprovedDateTo.HasValue)
