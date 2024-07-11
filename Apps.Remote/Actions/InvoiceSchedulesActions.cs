@@ -86,7 +86,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                     }),
                     note = request.Note ?? string.Empty,
                     nr_occurrences = request.NrOccurrences.HasValue ? request.NrOccurrences.Value.ToString() : "1",
-                    number = request.Number ?? "1"
+                    number = request.Number.HasValue ? request.Number.Value.ToString() : "1"
                 }
             }
         };
@@ -94,9 +94,10 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var apiRequest = new ApiRequest("/v1/contractor-invoice-schedules", Method.Post, Creds)
             .WithJsonBody(body);
         
-        var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
-        response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
-        return response.Data!.InvoiceSchedule;
+        var response = await Client.ExecuteWithErrorHandling<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
+        var invoice = response.Data!.InvoiceScheduleResponses.FirstOrDefault() ?? throw new Exception("Invoice schedule returned unexpected response.");
+        invoice.SetItemAmountsAndDescriptions();
+        return invoice;
     }
     
     [Action("Import invoice schedules", Description = "Import invoice schedules from a JSON file")]
@@ -108,18 +109,29 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         
         var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
         var invoiceToImport = invoicesDto.Invoices.First();
+
+        var result = int.TryParse(invoiceToImport.InvoiceNumber, out var number);
+        number = request.Number ?? (result ? number : 1);
+        var startDate = request.StartDate ?? (invoiceToImport.InvoiceDate < DateTime.Now ? DateTime.Now.AddDays(7) : invoiceToImport.InvoiceDate);
+        
+        var amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList();
+        var sum = amounts.Sum();
+        if (sum < 100)
+        {
+            throw new ArgumentException("Sum of amounts must be greater than 100");
+        }
         
         var createRequest = new CreateInvoiceScheduleRequest
         {
             EmploymentId = request.EmploymentId,
             Currency = invoiceToImport.Currency,
-            StartDate = invoiceToImport.InvoiceDate,
+            StartDate = startDate,
             Periodicity = request.Periodicity ?? "monthly",
-            Amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList(),
+            Amounts = amounts,
             Descriptions = invoiceToImport.Lines.Select(line => line.Description).ToList(),
             Note = request.Description ?? $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
             NrOccurrences = request.NrOccurrences ?? 1,
-            Number = invoiceToImport.InvoiceNumber
+            Number = number
         };
 
         return await CreateInvoiceSchedule(createRequest);
