@@ -1,6 +1,8 @@
+using Apps.Remote.DataSourceHandlers;
 using Apps.Remote.DataSourceHandlers.Static;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Remote.Models.Requests.Employments;
 
@@ -21,7 +23,7 @@ public class CreateEmploymentRequest
     [Display("Seniority date", Description = "The date the employee first started working for your company. If you don’t include a seniority date, the employee’s start date with Remote will be deemed as the start of the employee’s seniority")]
     public DateTime? SeniorityDate { get; set; }
     
-    [Display("Country code")]
+    [Display("Country code"), DataSource(typeof(CountryDataSource))]
     public string CountryCode { get; set; } = string.Empty;
     
     [Display("Type", Description = "If not provided, it will default to 'employee'"), StaticDataSource(typeof(EmploymentTypeDataSource))]
