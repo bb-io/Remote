@@ -36,6 +36,7 @@ Before you can connect you need to make sure that:
 - **Create employment** Create employment with specified data.
 - **Update employment** Update employment by ID with specified data.
 - **Invite employment** Invite employment by ID to start the self-enrollment
+- **Get employment custom field** Get employment custom field value by ID
 
 ### Invoices
 
@@ -48,6 +49,7 @@ Before you can connect you need to make sure that:
 - **Get invoice schedule** Get invoice schedule by ID.
 - **Create invoice schedule** Create invoice schedule with specified data.
 - **Update invoice schedule** Update invoice schedule by ID with specified data.
+- **Import invoice schedule** Import invoice schedules from a JSON file
 
 ## Events
 

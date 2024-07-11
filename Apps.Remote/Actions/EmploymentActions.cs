@@ -3,6 +3,7 @@ using Apps.Remote.Invocables;
 using Apps.Remote.Models.Dtos;
 using Apps.Remote.Models.Identifiers;
 using Apps.Remote.Models.Requests.Employments;
+using Apps.Remote.Models.Responses.CustomFields;
 using Apps.Remote.Models.Responses.Employments;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -54,6 +55,22 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
 
         return response.Data?.Employment!;
+    }
+    
+    [Action("Get employment custom field", Description = "Get employment custom field value by ID")]
+    public async Task<CustomFieldValueResponse> GetEmploymentCustomFieldValue([ActionParameter] CustomFieldIdentifier customFieldIdentifier,
+        [ActionParameter] EmploymentIdentifier employmentIdentifier)
+    {
+        var endpoint =
+            $"/v1/custom-fields/{customFieldIdentifier.CustomFieldId}/values/{employmentIdentifier.EmploymentId}";
+        var apiRequest = new ApiRequest(endpoint, Method.Get, Creds);
+        var response = await Client.ExecuteWithErrorHandling<BaseDto<CustomFieldDto>>(apiRequest);
+        if (response.Data != null)
+        {
+            response.Data.CustomFieldValue.Value ??= string.Empty;
+        }
+
+        return response.Data?.CustomFieldValue ?? new CustomFieldValueResponse() { CustomFieldId = customFieldIdentifier.CustomFieldId, Value = string.Empty };
     }
     
     [Action("Create employment", Description = "Create employment with specified data")]

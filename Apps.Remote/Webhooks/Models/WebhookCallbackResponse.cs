@@ -4,6 +4,9 @@ namespace Apps.Remote.Webhooks.Models;
 
 public class WebhookCallbackResponse
 {
+    [JsonProperty("id")]
+    public string Id { get; set; } = string.Empty;  
+    
     [JsonProperty("url")] 
     public string Url { get; set; } = string.Empty;
     

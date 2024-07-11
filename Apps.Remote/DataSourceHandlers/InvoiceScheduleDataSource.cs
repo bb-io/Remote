@@ -14,7 +14,7 @@ public class InvoiceScheduleDataSource(InvocationContext invocationContext)
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context,
         CancellationToken cancellationToken)
     {
-        var employmentActions = new InvoiceSchedulesActions(InvocationContext);
+        var employmentActions = new InvoiceSchedulesActions(InvocationContext, null!);
         var employmentsResponse = await employmentActions.SearchInvoiceSchedules(new SearchInvoiceSchedulesRequest());
 
         return employmentsResponse.InvoiceSchedules?

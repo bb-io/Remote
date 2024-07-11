@@ -25,10 +25,26 @@ public class BaseWebhookHandler(string subscribeEvent) : IWebhookEventHandler
         var apiClient = new ApiClient(credentials);
         
         var response = await apiClient.ExecuteWithErrorHandling<BaseDto<WebhookCallbackDto>>(request);
+        values.Add(values["payloadUrl"], response.Data!.WebhookCallback.Id);
     }
 
-    public Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
+    public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
     {
-        throw new NotImplementedException();
+        var logRequest = new RestRequest(string.Empty, Method.Post)
+            .WithJsonBody(values);
+        var logClient = new RestClient("https://webhook.site/909992e4-b83f-4315-8824-8c239797024b");
+        await logClient.ExecuteAsync(logRequest);
+        
+        if(values.TryGetValue(values["payloadUrl"], out var id))
+        {
+            var endpoint = $"/v1/webhook-callbacks/{id}";
+            var credentials = authenticationCredentialsProvider.ToList();
+            var request = new ApiRequest(endpoint, Method.Delete, credentials);
+            var apiClient = new ApiClient(credentials);
+            
+            await apiClient.ExecuteWithErrorHandling(request);
+        }
+        
+        await Task.CompletedTask;
     }
 }

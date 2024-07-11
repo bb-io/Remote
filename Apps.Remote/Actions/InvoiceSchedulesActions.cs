@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Apps.Remote.Api;
 using Apps.Remote.Invocables;
 using Apps.Remote.Models.Dtos;
@@ -8,13 +9,16 @@ using Apps.Remote.Models.Responses.InvoiceSchedules;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.Remote.Actions;
 
 [ActionList]
-public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppInvocable(invocationContext)
+public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : AppInvocable(invocationContext)
 {
     private const int DefaultPageSize = 50;
 
@@ -93,6 +97,32 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext) : AppI
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
         response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
         return response.Data!.InvoiceSchedule;
+    }
+    
+    [Action("Import invoice schedules", Description = "Import invoice schedules from a JSON file")]
+    public async Task<InvoiceScheduleResponse> ImportInvoiceSchedules([ActionParameter] ImportInvoiceRequest request)
+    {
+        var stream = await fileManagementClient.DownloadAsync(request.File);
+        var bytes = await stream.GetByteData();
+        var json = Encoding.UTF8.GetString(bytes);
+        
+        var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
+        var invoiceToImport = invoicesDto.Invoices.First();
+        
+        var createRequest = new CreateInvoiceScheduleRequest
+        {
+            EmploymentId = request.EmploymentId,
+            Currency = invoiceToImport.Currency,
+            StartDate = invoiceToImport.InvoiceDate,
+            Periodicity = request.Periodicity ?? "monthly",
+            Amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList(),
+            Descriptions = invoiceToImport.Lines.Select(line => line.Description).ToList(),
+            Note = request.Description ?? $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
+            NrOccurrences = request.NrOccurrences ?? 1,
+            Number = invoiceToImport.InvoiceNumber
+        };
+
+        return await CreateInvoiceSchedule(createRequest);
     }
     
     [Action("Update invoice schedule", Description = "Update invoice schedule by ID with specified data")]
