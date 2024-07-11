@@ -29,5 +29,5 @@ public class CreateInvoiceScheduleRequest : EmploymentIdentifier
     public int? NrOccurrences { get; set; }
     
     [Display("Number", Description = "Invoice identifier")]
-    public int? Number { get; set; }
+    public string? Number { get; set; }
 }

@@ -28,4 +28,7 @@ public class SearchInvoiceSchedulesRequest
 
     [Display("Currency"), JsonProperty("currency")]
     public string? Currency { get; set; }
+    
+    [Display("Number")]
+    public string? Number { get; set; }
 }

@@ -44,6 +44,11 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             currentPage++;
         } while (currentPage <= invoiceSchedulesResponse.TotalPages);
 
+        if (request.Number != null)
+        {
+            allInvoiceSchedules = allInvoiceSchedules.Where(x => x.Number == request.Number).ToList();
+        }
+
         return new InvoiceSchedulesResponse
         {
             TotalCount = allInvoiceSchedules.Count,
@@ -51,6 +56,14 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             TotalPages = 1,
             InvoiceSchedules = allInvoiceSchedules
         };
+    }
+
+    [Action("Find invoice schedule", Description = "Find invoice schedule by specified criteria")]
+    public async Task<InvoiceScheduleResponse> FindInvoiceSchedule(
+        [ActionParameter] SearchInvoiceSchedulesRequest request)
+    {
+        var response = await SearchInvoiceSchedules(request);
+        return response.InvoiceSchedules?.FirstOrDefault() ?? new InvoiceScheduleResponse();
     }
     
     [Action("Get invoice schedule", Description = "Get invoice schedule by ID")]
@@ -86,7 +99,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                     }),
                     note = request.Note ?? string.Empty,
                     nr_occurrences = request.NrOccurrences.HasValue ? request.NrOccurrences.Value.ToString() : "1",
-                    number = request.Number.HasValue ? request.Number.Value.ToString() : "1"
+                    number = request.Number ?? "1"
                 }
             }
         };
@@ -106,18 +119,12 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var stream = await fileManagementClient.DownloadAsync(request.File);
         var bytes = await stream.GetByteData();
         var json = Encoding.UTF8.GetString(bytes);
-
-        var logRequest = new RestRequest(string.Empty, Method.Post)
-            .WithJsonBody(new { Json = json });
-        var restClient = new RestClient("https://webhook.site/909992e4-b83f-4315-8824-8c239797024b");
-        
-        await restClient.ExecuteAsync(logRequest);
         
         var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
         var invoiceToImport = invoicesDto.Invoices.First();
 
         var result = int.TryParse(invoiceToImport.InvoiceNumber, out var number);
-        number = request.Number ?? (result ? number : 1);
+        var apiNumber = request.Number ?? (result ? number.ToString() : "1");
         var startDate = request.StartDate ?? (invoiceToImport.InvoiceDate < DateTime.Now ? DateTime.Now.AddDays(7) : invoiceToImport.InvoiceDate);
         
         var amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList();
@@ -137,7 +144,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             Descriptions = invoiceToImport.Lines.Select(line => line.Description).ToList(),
             Note = request.Description ?? $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
             NrOccurrences = request.NrOccurrences ?? 1,
-            Number = number
+            Number = apiNumber
         };
 
         return await CreateInvoiceSchedule(createRequest);

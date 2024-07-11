@@ -19,7 +19,7 @@ public class ImportInvoiceRequest : EmploymentIdentifier
     public int? NrOccurrences { get; set; }
     
     [Display("Number", Description = "Invoice identifier")]
-    public int? Number { get; set; }
+    public string? Number { get; set; }
 
     [Display("Start date", Description = "Date of the first contractor invoice generation. If you will not specify it it will be set to the current date + 7 days")]
     public DateTime? StartDate { get; set; }
