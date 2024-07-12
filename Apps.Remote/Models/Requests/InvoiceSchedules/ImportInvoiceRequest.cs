@@ -6,7 +6,7 @@ using Blackbird.Applications.Sdk.Common.Files;
 
 namespace Apps.Remote.Models.Requests.InvoiceSchedules;
 
-public class ImportInvoiceRequest : EmploymentIdentifier
+public class ImportInvoiceRequest : ContractorIdentifier
 {
     public FileReference File { get; set; } = new();
 
