@@ -45,11 +45,11 @@ Before you can connect you need to make sure that:
 
 ### Invoice schedules
 
-- **Search invoice schedules** Search invoice schedules based on specified criteria.
-- **Get invoice schedule** Get invoice schedule by ID.
-- **Create invoice schedule** Create invoice schedule with specified data.
-- **Update invoice schedule** Update invoice schedule by ID with specified data.
-- **Import invoice schedule** Import invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
+- **Search invoice schedules** Search сontractor invoice schedules based on specified criteria.
+- **Get invoice schedule** Get сontractor invoice schedule by ID.
+- **Create invoice schedule** Create сontractor invoice schedule with specified data.
+- **Update invoice schedule** Update сontractor invoice schedule by ID with specified data.
+- **Import invoice schedule** Import сontractor invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
 ## Events
 
@@ -65,6 +65,12 @@ Before you can connect you need to make sure that:
 - **On invoices status changed** This event returns invoices that changed status since the last polling time. 
 
 Note: Invoice events are based on polling. This means that the event will be triggered based on the polling interval you set in the event configuration.
+
+## Missing features
+
+Remote API is quite extensive and we are working on adding more features to the app. If you are missing a feature, please let us know.
+
+You can check which features are supported by the Remote API [here](https://remote.com/resources/api/reference#section/Authentication).
 
 ## Feedback
 

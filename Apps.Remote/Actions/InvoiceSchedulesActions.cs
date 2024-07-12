@@ -22,7 +22,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 {
     private const int DefaultPageSize = 50;
 
-    [Action("Search invoice schedules", Description = "Search invoice schedules based on specified criteria")]
+    [Action("Search invoice schedules", Description = "Search сontractor invoice schedules based on specified criteria")]
     public async Task<InvoiceSchedulesResponse> SearchInvoiceSchedules([ActionParameter] SearchInvoiceSchedulesRequest request)
     {
         var allInvoiceSchedules = new List<InvoiceScheduleResponse>();
@@ -57,16 +57,8 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             InvoiceSchedules = allInvoiceSchedules
         };
     }
-
-    [Action("Find invoice schedule", Description = "Find invoice schedule by specified criteria")]
-    public async Task<InvoiceScheduleResponse> FindInvoiceSchedule(
-        [ActionParameter] SearchInvoiceSchedulesRequest request)
-    {
-        var response = await SearchInvoiceSchedules(request);
-        return response.InvoiceSchedules?.FirstOrDefault() ?? new InvoiceScheduleResponse();
-    }
     
-    [Action("Get invoice schedule", Description = "Get invoice schedule by ID")]
+    [Action("Get invoice schedule", Description = "Get сontractor invoice schedule by ID")]
     public async Task<InvoiceScheduleResponse> GetInvoiceSchedule([ActionParameter] InvoiceScheduleIdentifier identifier)
     {
         var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{identifier.InvoiceScheduleId}", Method.Get, Creds);
@@ -76,7 +68,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         return response.Data!.InvoiceSchedule;
     }
     
-    [Action("Create invoice schedule", Description = "Create invoice schedule with specified data.")]
+    [Action("Create invoice schedule", Description = "Create сontractor invoice schedule with specified data.")]
     public async Task<InvoiceScheduleResponse> CreateInvoiceSchedule([ActionParameter] CreateInvoiceScheduleRequest request)
     {
         if(request.Amounts.Count != request.Descriptions.Count)
@@ -103,8 +95,6 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                 }
             }
         };
-
-        var json = JsonConvert.SerializeObject(body);
         
         var apiRequest = new ApiRequest("/v1/contractor-invoice-schedules", Method.Post, Creds)
             .WithJsonBody(body);
@@ -131,7 +121,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         return invoice;
     }
     
-    [Action("Import invoice schedules", Description = "Import invoice schedules from a JSON file")]
+    [Action("Import invoice schedules", Description = "Import сontractor invoice schedules from a JSON file")]
     public async Task<InvoiceScheduleResponse> ImportInvoiceSchedules([ActionParameter] ImportInvoiceRequest request)
     {
         var stream = await fileManagementClient.DownloadAsync(request.File);
@@ -168,7 +158,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         return await CreateInvoiceSchedule(createRequest);
     }
     
-    [Action("Update invoice schedule", Description = "Update invoice schedule by ID with specified data")]
+    [Action("Update invoice schedule", Description = "Update сontractor invoice schedule by ID with specified data")]
     public async Task<InvoiceScheduleResponse> UpdateInvoiceSchedule([ActionParameter] UpdateInvoiceScheduleRequest request)
     {
         if (request.Amounts?.Count != request.Descriptions?.Count)
