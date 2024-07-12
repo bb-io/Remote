@@ -7,7 +7,7 @@ public class Application : IApplication, ICategoryProvider
 {
     public string Name
     {
-        get => "App";
+        get => "Remote";
         set { }
     }
 
@@ -18,7 +18,7 @@ public class Application : IApplication, ICategoryProvider
 
     public IEnumerable<ApplicationCategory> Categories
     {
-        get => new []{ ApplicationCategory.Marketing };
+        get => new []{ ApplicationCategory.TranslationBusinessManagement, ApplicationCategory.Fintech };
         set { }
     }
 }
