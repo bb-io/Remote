@@ -49,7 +49,7 @@ Before you can connect you need to make sure that:
 - **Get invoice schedule** Get invoice schedule by ID.
 - **Create invoice schedule** Create invoice schedule with specified data.
 - **Update invoice schedule** Update invoice schedule by ID with specified data.
-- **Import invoice schedule** Import invoice schedules from a JSON file
+- **Import invoice schedule** Import invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
 ## Events
 
