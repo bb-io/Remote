@@ -99,23 +99,8 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var apiRequest = new ApiRequest("/v1/contractor-invoice-schedules", Method.Post, Creds)
             .WithJsonBody(body);
         
-        var response = await Client.ExecuteAsync<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
-        var content = response.Content!;
-
-        if (response.IsSuccessStatusCode == false)
-        {
-            if(response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
-            {
-                var data = JsonConvert.DeserializeObject<BaseDto<CreatedInvoiceScheduleDto>>(content)!;
-                var errors = data.Data!.ToString();
-
-                throw new Exception(errors);
-            }
-
-            throw new Exception(response.ErrorMessage ?? response.Content);
-        }
-
-        var invoiceScheduleResponses = JsonConvert.DeserializeObject<BaseDto<CreatedInvoiceScheduleDto>>(content)!;
+        var invoiceScheduleResponses = await Client.ExecuteWithErrorHandling<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
+        
         var invoice = invoiceScheduleResponses.Data!.InvoiceScheduleResponses.FirstOrDefault() ?? throw new Exception("Invoice schedule returned unexpected response.");
         invoice.SetItemAmountsAndDescriptions();
         return invoice;
