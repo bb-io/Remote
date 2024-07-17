@@ -17,13 +17,8 @@ public class EmploymentDataSource(InvocationContext invocationContext)
         var employmentsResponse = await employmentActions.SearchEmployments(new SearchEmploymentsRequest());
 
         return employmentsResponse.Employments?
-                   .Where(x => context.SearchString == null || BuildReadableName(x).Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-                   .ToDictionary(x => x.Id, BuildReadableName)
+                   .Where(x => context.SearchString == null || x.FullName.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+                   .ToDictionary(x => x.Id, x => x.FullName)
                ?? new Dictionary<string, string>();
-    }
-    
-    private string BuildReadableName(EmploymentResponse employment)
-    {
-        return $"[{employment.Type}] {employment.FullName}";
     }
 }

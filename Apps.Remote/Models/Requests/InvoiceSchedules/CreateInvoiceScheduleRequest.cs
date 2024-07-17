@@ -5,7 +5,7 @@ using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Remote.Models.Requests.InvoiceSchedules;
 
-public class CreateInvoiceScheduleRequest : EmploymentIdentifier
+public class CreateInvoiceScheduleRequest : ContractorIdentifier
 {
     [Display("Currency", Description = "Currency code in ISO 4217 format"), StaticDataSource(typeof(CurrencyDataSource))]
     public string Currency { get; set; } = string.Empty;
