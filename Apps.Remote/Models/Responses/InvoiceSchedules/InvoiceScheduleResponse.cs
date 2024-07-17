@@ -30,10 +30,10 @@ public class InvoiceScheduleResponse
     public string Note { get; set; } = string.Empty;
 
     [Display("Start Date"), JsonProperty("start_date")]
-    public DateTime StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
 
     [Display("Total Amount"), JsonProperty("total_amount")]
-    public decimal TotalAmount { get; set; }
+    public double? TotalAmount { get; set; }
 
     [Display("Employment ID"), JsonProperty("employment_id")]
     public string EmploymentId { get; set; } = string.Empty;
@@ -42,7 +42,7 @@ public class InvoiceScheduleResponse
     public DateTime? NextInvoiceAt { get; set; }
 
     [Display("Number of Occurrences"), JsonProperty("nr_occurrences")]
-    public int NumberOfOccurrences { get; set; }
+    public int? NumberOfOccurrences { get; set; }
 
     [JsonProperty("periodicity")]
     public string Periodicity { get; set; } = string.Empty;

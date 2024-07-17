@@ -23,8 +23,8 @@ public class InvoiceResponse
     [Display("Description"), JsonProperty("description")]
     public string Description { get; set; } = string.Empty;
 
-    [Display("Due Date"), JsonProperty("due_date")]
-    public DateTime DueDate { get; set; }
+    [Display("Due date"), JsonProperty("due_date")]
+    public DateTime? DueDate { get; set; }
 
     [Display("Invoice ID"), JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
@@ -54,7 +54,7 @@ public class InvoiceResponse
     public string Status { get; set; } = string.Empty;
 
     [Display("Target Amount"), JsonProperty("target_amount")]
-    public double TargetAmount { get; set; }
+    public double? TargetAmount { get; set; }
 
     [Display("Target Currency"), JsonProperty("target_currency")]
     public string TargetCurrency { get; set; } = string.Empty;

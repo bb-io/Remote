@@ -25,6 +25,11 @@ public class InvoiceScheduleDataSource(InvocationContext invocationContext)
     
     private string BuildReadableName(InvoiceScheduleResponse invoiceSchedule)
     {
-        return $"({invoiceSchedule.StartDate.ToString("yyyy MMMM dd", CultureInfo.InvariantCulture)}) {invoiceSchedule.Currency}";
+        if (invoiceSchedule.StartDate == null)
+        {
+            return $"[{invoiceSchedule.Currency}] {invoiceSchedule.TotalAmount}";
+        }
+        
+        return $"({invoiceSchedule.StartDate.Value.ToString("yyyy MMMM dd", CultureInfo.InvariantCulture)}) {invoiceSchedule.Currency}";
     }
 }

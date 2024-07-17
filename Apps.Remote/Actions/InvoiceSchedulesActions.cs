@@ -82,7 +82,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                 {
                     employment_id = request.EmploymentId,
                     currency = request.Currency,
-                    start_date = request.StartDate.ToString("yyyy-MM-dd"),
+                    start_date = request.StartDate.ToUniversalTime().ToString("yyyy-MM-dd"),
                     periodicity = request.Periodicity,
                     items = request.Amounts.Select((amount, index) => new
                     {
