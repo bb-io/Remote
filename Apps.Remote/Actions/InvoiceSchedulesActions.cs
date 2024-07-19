@@ -29,6 +29,8 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var currentPage = 1;
         InvoiceSchedulesResponse invoiceSchedulesResponse;
 
+        await Logger.LogAsync(new { request });
+
         do
         {
             var apiRequest = CreateApiRequest(request, currentPage, DefaultPageSize);
@@ -221,6 +223,11 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         apiRequest.AddParameter("page", currentPage, ParameterType.QueryString);
         apiRequest.AddParameter("page_size", pageSize, ParameterType.QueryString);
+        
+        Logger.Log(new
+        {
+            apiRequest
+        });
 
         return apiRequest;
     }
