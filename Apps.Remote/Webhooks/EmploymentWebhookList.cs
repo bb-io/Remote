@@ -39,37 +39,23 @@ public class EmploymentWebhookList(InvocationContext invocationContext) : AppInv
     
     private async Task<WebhookResponse<EmploymentResponse>> HandleEmploymentWebhook(WebhookRequest webhookRequest)
     {
-        try
+        var payload = webhookRequest.Body.ToString()!;
+        if (string.IsNullOrEmpty(payload))
         {
-            var payload = webhookRequest.Body.ToString()!;
-            if (string.IsNullOrEmpty(payload))
-            {
-                throw new Exception("Payload is empty");
-            }
-
-            var employmentPayload = JsonConvert.DeserializeObject<EmploymentPayload>(payload) ??
-                                    throw new Exception($"Failed to deserialize payload: {payload}");
-
-            var employmentActions = new EmploymentActions(InvocationContext);
-            var employment = await employmentActions.GetEmployment(new EmploymentIdentifier
-                { EmploymentId = employmentPayload.EmploymentId });
-
-            return new WebhookResponse<EmploymentResponse>
-            {
-                Result = employment,
-                ReceivedWebhookRequestType = WebhookRequestType.Default
-            };
+            throw new Exception("Payload is empty");
         }
-        catch (Exception e)
+
+        var employmentPayload = JsonConvert.DeserializeObject<EmploymentPayload>(payload) ??
+                                throw new Exception($"Failed to deserialize payload: {payload}");
+
+        var employmentActions = new EmploymentActions(InvocationContext);
+        var employment = await employmentActions.GetEmployment(new EmploymentIdentifier
+            { EmploymentId = employmentPayload.EmploymentId });
+
+        return new WebhookResponse<EmploymentResponse>
         {
-            return new WebhookResponse<EmploymentResponse>
-            {
-                ReceivedWebhookRequestType = WebhookRequestType.Default,
-                Result = new EmploymentResponse()
-                {
-                    FullName = e.Message
-                }
-            };
-        }
+            Result = employment,
+            ReceivedWebhookRequestType = WebhookRequestType.Default
+        };
     }
 }
