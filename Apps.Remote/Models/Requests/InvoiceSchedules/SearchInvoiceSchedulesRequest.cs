@@ -33,6 +33,6 @@ public class SearchInvoiceSchedulesRequest
     [Display("Currency"), JsonProperty("currency"), StaticDataSource(typeof(CurrencyDataSource))]
     public string? Currency { get; set; }
     
-    [Display("Number")]
+    [Display("Invoice number")]
     public string? Number { get; set; }
 }

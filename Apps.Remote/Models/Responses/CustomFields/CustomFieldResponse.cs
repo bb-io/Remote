@@ -1,3 +1,4 @@
+using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
 namespace Apps.Remote.Models.Responses.CustomFields;
@@ -16,9 +17,9 @@ public class CustomFieldResponse
     [JsonProperty("required")]
     public bool Required { get; set; }
     
-    [JsonProperty("visibility_scope")]
+    [JsonProperty("visibility_scope"), Display("Visibility score")]
     public string VisibilityScope { get; set; } = string.Empty;
     
-    [JsonProperty("data_entry_access")]
+    [JsonProperty("data_entry_access"), Display("Data entry access")]
     public string DataEntryAccess { get; set; } = string.Empty;
 }

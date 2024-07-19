@@ -52,6 +52,7 @@ public class InvoiceActions(InvocationContext invocationContext) : AppInvocable(
         var apiRequest = new ApiRequest($"/v1/contractor-invoices/{identifier.InvoiceId}", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceDto>>(apiRequest);
 
+        response.Data?.Invoice.SetItemAmountsAndDescriptions();
         return response.Data!.Invoice;
     }
     

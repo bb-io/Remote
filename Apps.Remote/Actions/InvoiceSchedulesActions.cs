@@ -6,7 +6,6 @@ using Apps.Remote.Models.Dtos;
 using Apps.Remote.Models.Identifiers;
 using Apps.Remote.Models.Requests.InvoiceSchedules;
 using Apps.Remote.Models.Responses.InvoiceSchedules;
-using Apps.Remote.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -19,18 +18,19 @@ using RestSharp;
 namespace Apps.Remote.Actions;
 
 [ActionList]
-public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : AppInvocable(invocationContext)
+public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
+    : AppInvocable(invocationContext)
 {
     private const int DefaultPageSize = 50;
 
-    [Action("Search invoice schedules", Description = "Search сontractor invoice schedules based on specified criteria")]
-    public async Task<InvoiceSchedulesResponse> SearchInvoiceSchedules([ActionParameter] SearchInvoiceSchedulesRequest request)
+    [Action("Search invoice schedules",
+        Description = "Search сontractor invoice schedules based on specified criteria")]
+    public async Task<InvoiceSchedulesResponse> SearchInvoiceSchedules(
+        [ActionParameter] SearchInvoiceSchedulesRequest request)
     {
         var allInvoiceSchedules = new List<InvoiceScheduleResponse>();
         var currentPage = 1;
         InvoiceSchedulesResponse invoiceSchedulesResponse;
-
-        //await Logger.LogAsync(new { request });
 
         do
         {
@@ -60,23 +60,26 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             InvoiceSchedules = allInvoiceSchedules
         };
     }
-    
+
     [Action("Get invoice schedule", Description = "Get сontractor invoice schedule by ID")]
-    public async Task<InvoiceScheduleResponse> GetInvoiceSchedule([ActionParameter] InvoiceScheduleIdentifier identifier)
+    public async Task<InvoiceScheduleResponse> GetInvoiceSchedule(
+        [ActionParameter] InvoiceScheduleIdentifier identifier)
     {
-        var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{identifier.InvoiceScheduleId}", Method.Get, Creds);
+        var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{identifier.InvoiceScheduleId}", Method.Get,
+            Creds);
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
-        
+
         response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
         return response.Data!.InvoiceSchedule;
     }
-    
+
     [Action("Create invoice schedule", Description = "Create сontractor invoice schedule with specified data.")]
-    public async Task<InvoiceScheduleResponse> CreateInvoiceSchedule([ActionParameter] CreateInvoiceScheduleRequest request)
+    public async Task<InvoiceScheduleResponse> CreateInvoiceSchedule(
+        [ActionParameter] CreateInvoiceScheduleRequest request)
     {
-        if(request.Amounts.Count != request.Descriptions.Count)
+        if (request.Amounts.Count != request.Descriptions.Count)
             throw new ArgumentException("Amounts and Descriptions must have the same number of elements");
-        
+
         var body = new
         {
             contractor_invoice_schedules = new[]
@@ -98,38 +101,42 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
                 }
             }
         };
-        
+
         var apiRequest = new ApiRequest("/v1/contractor-invoice-schedules", Method.Post, Creds)
             .WithJsonBody(body);
-        
-        var invoiceScheduleResponses = await Client.ExecuteWithErrorHandling<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
-        
-        var invoice = invoiceScheduleResponses.Data!.InvoiceScheduleResponses.FirstOrDefault() ?? throw new Exception("Invoice schedule returned unexpected response.");
+
+        var invoiceScheduleResponses =
+            await Client.ExecuteWithErrorHandling<BaseDto<CreatedInvoiceScheduleDto>>(apiRequest);
+
+        var invoice = invoiceScheduleResponses.Data!.InvoiceScheduleResponses.FirstOrDefault() ??
+                      throw new Exception("Invoice schedule returned unexpected response.");
         invoice.SetItemAmountsAndDescriptions();
         return invoice;
     }
-    
+
     [Action("Import invoice schedules", Description = "Import сontractor invoice schedules from a JSON file")]
     public async Task<InvoiceScheduleResponse> ImportInvoiceSchedules([ActionParameter] ImportInvoiceRequest request)
     {
         var stream = await fileManagementClient.DownloadAsync(request.File);
         var bytes = await stream.GetByteData();
         var json = Encoding.UTF8.GetString(bytes);
-        
+
         var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
         var invoiceToImport = invoicesDto.Invoices.First();
 
         var result = int.TryParse(invoiceToImport.InvoiceNumber, out var number);
         var apiNumber = request.Number ?? (result ? number.ToString() : "1");
-        var startDate = request.StartDate ?? (invoiceToImport.InvoiceDate < DateTime.Now ? DateTime.Now.AddDays(7) : invoiceToImport.InvoiceDate);
-        
+        var startDate = request.StartDate ?? (invoiceToImport.InvoiceDate < DateTime.Now
+            ? DateTime.Now.AddDays(7)
+            : invoiceToImport.InvoiceDate);
+
         var amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList();
         var sum = amounts.Sum();
         if (sum < 100)
         {
             throw new ArgumentException("Sum of amounts must be greater than 100");
         }
-        
+
         var createRequest = new CreateInvoiceScheduleRequest
         {
             EmploymentId = request.EmploymentId,
@@ -138,28 +145,38 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             Periodicity = request.Periodicity ?? "monthly",
             Amounts = amounts,
             Descriptions = invoiceToImport.Lines.Select(line => line.Description).ToList(),
-            Note = request.Description ?? $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
+            Note = request.Description ??
+                   $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
             NrOccurrences = request.NrOccurrences ?? 1,
             Number = apiNumber
         };
 
         return await CreateInvoiceSchedule(createRequest);
     }
-    
+
     [Action("Update invoice schedule", Description = "Update сontractor invoice schedule by ID with specified data")]
-    public async Task<InvoiceScheduleResponse> UpdateInvoiceSchedule([ActionParameter] UpdateInvoiceScheduleRequest request)
+    public async Task<InvoiceScheduleResponse> UpdateInvoiceSchedule(
+        [ActionParameter] UpdateInvoiceScheduleRequest request)
     {
+        if (request.Number == null && request.Currency == null && request.StartDate == null &&
+            request.Periodicity == null
+            && request.Amounts == null && request.Descriptions == null && request.Note == null &&
+            request.NrOccurrences == null)
+        {
+            throw new ArgumentException("At least one field must be specified for update");
+        }
+
         if (request.Amounts?.Count != request.Descriptions?.Count)
         {
             throw new ArgumentException("Amounts and Descriptions must have the same number of elements");
         }
-        
+
         var items = request.Amounts?.Select((amount, index) => new
         {
             amount = amount.ToString(CultureInfo.InvariantCulture),
             description = request.Descriptions!.ElementAtOrDefault(index)
         }).ToList();
-        
+
         var body = new
         {
             currency = request.Currency,
@@ -169,10 +186,11 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             nr_occurrences = request.NrOccurrences,
             number = request.Number
         };
-        
-        var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{request.InvoiceScheduleId}", Method.Patch, Creds)
+
+        var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{request.InvoiceScheduleId}", Method.Patch,
+                Creds)
             .WithJsonBody(body);
-        
+
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
         response.Data!.InvoiceSchedule.SetItemAmountsAndDescriptions();
         return response.Data!.InvoiceSchedule;
@@ -184,22 +202,26 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         if (request.StartDateFrom.HasValue)
         {
-            apiRequest.AddParameter("start_date_from", request.StartDateFrom.Value.ToAppropriateTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("start_date_from", request.StartDateFrom.Value.ToString("yyyy-MM-dd"),
+                ParameterType.QueryString);
         }
 
         if (request.StartDateTo.HasValue)
         {
-            apiRequest.AddParameter("start_date_to", request.StartDateTo.Value.ToAppropriateTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("start_date_to", request.StartDateTo.Value.ToString("yyyy-MM-dd"),
+                ParameterType.QueryString);
         }
 
         if (request.NextInvoiceDateFrom.HasValue)
         {
-            apiRequest.AddParameter("next_invoice_date_from", request.NextInvoiceDateFrom.Value.ToAppropriateTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("next_invoice_date_from", request.NextInvoiceDateFrom.Value.ToString("yyyy-MM-dd"),
+                ParameterType.QueryString);
         }
 
         if (request.NextInvoiceDateTo.HasValue)
         {
-            apiRequest.AddParameter("next_invoice_date_to", request.NextInvoiceDateTo.Value.ToAppropriateTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("next_invoice_date_to", request.NextInvoiceDateTo.Value.ToString("yyyy-MM-dd"),
+                ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Status))
@@ -224,11 +246,6 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         apiRequest.AddParameter("page", currentPage, ParameterType.QueryString);
         apiRequest.AddParameter("page_size", pageSize, ParameterType.QueryString);
-        
-        Logger.Log(new
-        {
-            apiRequest
-        });
 
         return apiRequest;
     }

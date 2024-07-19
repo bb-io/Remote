@@ -21,7 +21,7 @@ public class SearchInvoicesRequest
     [Display("Date to"), JsonProperty("date_to")]
     public DateTime? DateTo { get; set; }
 
-    [Display("Due date fFrom"), JsonProperty("due_date_from")]
+    [Display("Due date from"), JsonProperty("due_date_from")]
     public DateTime? DueDateFrom { get; set; }
 
     [Display("Due date to"), JsonProperty("due_date_to")]
