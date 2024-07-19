@@ -30,7 +30,7 @@ public class SearchInvoiceSchedulesRequest
     [Display("Periodicity"), JsonProperty("periodicity"), StaticDataSource(typeof(PeriodicityDataSource))]
     public string? Periodicity { get; set; }
 
-    [Display("Currency"), JsonProperty("currency"), DataSource(typeof(CurrencyDataSource))]
+    [Display("Currency"), JsonProperty("currency"), StaticDataSource(typeof(CurrencyDataSource))]
     public string? Currency { get; set; }
     
     [Display("Number")]
