@@ -1,11 +1,10 @@
 namespace Apps.Remote.Utils;
 
-public class DateTimeExtensions
+public static class DateTimeExtensions
 {
-    public static DateTime ToAppropriateTime(DateTime dateTime)
+    public static DateTime ToAppropriateTime(this DateTime dateTime)
     {
-        var unixTime = ((DateTimeOffset)dateTime).ToUnixTimeSeconds();
-        var datetime = DateTimeOffset.FromUnixTimeSeconds(unixTime).UtcDateTime;
-        return datetime;
+        // assuming that server time is Eastern European Summer Time (EEST)
+        return dateTime.AddHours(3);
     }
 }
