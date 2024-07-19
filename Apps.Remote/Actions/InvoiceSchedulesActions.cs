@@ -186,17 +186,17 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         if (request.StartDateTo.HasValue)
         {
-            apiRequest.AddParameter("start_date_to", request.StartDateTo.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("start_date_to", request.StartDateTo.Value.ToUniversalTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.NextInvoiceDateFrom.HasValue)
         {
-            apiRequest.AddParameter("next_invoice_date_from", request.NextInvoiceDateFrom.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("next_invoice_date_from", request.NextInvoiceDateFrom.Value.ToUniversalTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.NextInvoiceDateTo.HasValue)
         {
-            apiRequest.AddParameter("next_invoice_date_to", request.NextInvoiceDateTo.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("next_invoice_date_to", request.NextInvoiceDateTo.Value.ToUniversalTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (!string.IsNullOrEmpty(request.Status))
