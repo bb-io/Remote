@@ -8,10 +8,10 @@ public class InvoiceResponse
     [Display("Amount"), JsonProperty("amount")]
     public double Amount { get; set; }
 
-    [Display("Approved At"), JsonProperty("approved_at")]
+    [Display("Approved at"), JsonProperty("approved_at")]
     public DateTime? ApprovedAt { get; set; }
 
-    [Display("Contractor Invoice Schedule ID"), JsonProperty("contractor_invoice_schedule_id")]
+    [Display("Contractor invoice schedule ID"), JsonProperty("contractor_invoice_schedule_id")]
     public string ContractorInvoiceScheduleId { get; set; } = string.Empty;
 
     [Display("Currency"), JsonProperty("currency")]
@@ -23,8 +23,8 @@ public class InvoiceResponse
     [Display("Description"), JsonProperty("description")]
     public string Description { get; set; } = string.Empty;
 
-    [Display("Due Date"), JsonProperty("due_date")]
-    public DateTime DueDate { get; set; }
+    [Display("Due date"), JsonProperty("due_date")]
+    public DateTime? DueDate { get; set; }
 
     [Display("Invoice ID"), JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
@@ -38,25 +38,25 @@ public class InvoiceResponse
     [Display("Item descriptions")]
     public List<string> ItemDescriptions { get; set; } = new ();
 
-    [Display("Invoice Number"), JsonProperty("number")]
+    [Display("Invoice number"), JsonProperty("number")]
     public string Number { get; set; } = string.Empty;
 
-    [Display("Paid Out At"), JsonProperty("paid_out_at")]
+    [Display("Paid out at"), JsonProperty("paid_out_at")]
     public DateTime? PaidOutAt { get; set; }
 
-    [Display("Source Amount"), JsonProperty("source_amount")]
+    [Display("Source amount"), JsonProperty("source_amount")]
     public double SourceAmount { get; set; }
 
-    [Display("Source Currency"), JsonProperty("source_currency")]
+    [Display("Source currency"), JsonProperty("source_currency")]
     public string SourceCurrency { get; set; } = string.Empty;
 
     [Display("Status"), JsonProperty("status")]
     public string Status { get; set; } = string.Empty;
 
-    [Display("Target Amount"), JsonProperty("target_amount")]
-    public double TargetAmount { get; set; }
+    [Display("Target amount"), JsonProperty("target_amount")]
+    public double? TargetAmount { get; set; }
 
-    [Display("Target Currency"), JsonProperty("target_currency")]
+    [Display("Target currency"), JsonProperty("target_currency")]
     public string TargetCurrency { get; set; } = string.Empty;
     
     public void SetItemAmountsAndDescriptions()

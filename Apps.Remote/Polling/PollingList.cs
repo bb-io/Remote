@@ -78,6 +78,7 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
 
             if (invoiceResponse.Invoices != null)
             {
+                invoiceResponse.Invoices.ForEach(x => x.SetItemAmountsAndDescriptions());
                 allInvoices.AddRange(invoiceResponse.Invoices);
             }
 

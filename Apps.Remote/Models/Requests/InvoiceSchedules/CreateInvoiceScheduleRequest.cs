@@ -13,7 +13,7 @@ public class CreateInvoiceScheduleRequest : ContractorIdentifier
     [Display("Start date", Description = "Date of the first contractor invoice generation")]
     public DateTime StartDate { get; set; }
     
-    [Display("Periodicity", Description = "Defines how often contractor invoices will be generate"), StaticDataSource(typeof(PeriodicityDataSource))]
+    [Display("Periodicity", Description = "Defines how often contractor invoices will be generated"), StaticDataSource(typeof(PeriodicityDataSource))]
     public string Periodicity { get; set; } = string.Empty;
 
     [Display("Amounts", Description = "List of amounts that will be used to generate invoices")]

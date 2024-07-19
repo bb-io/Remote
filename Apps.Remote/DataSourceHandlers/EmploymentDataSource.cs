@@ -1,6 +1,7 @@
 using Apps.Remote.Actions;
 using Apps.Remote.Invocables;
 using Apps.Remote.Models.Requests.Employments;
+using Apps.Remote.Models.Responses.Employments;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 

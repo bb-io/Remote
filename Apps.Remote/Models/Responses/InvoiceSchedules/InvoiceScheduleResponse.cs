@@ -5,13 +5,13 @@ namespace Apps.Remote.Models.Responses.InvoiceSchedules;
 
 public class InvoiceScheduleResponse
 {
-    [Display("Invoice Schedule ID"), JsonProperty("id")]
+    [Display("Invoice schedule ID"), JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
     [JsonProperty("status")]
     public string Status { get; set; } = string.Empty;
 
-    [Display("Invoice Number"), JsonProperty("number")]
+    [Display("Invoice number"), JsonProperty("number")]
     public string Number { get; set; } = string.Empty;
 
     [JsonProperty("items")]
@@ -29,20 +29,20 @@ public class InvoiceScheduleResponse
     [JsonProperty("note")]
     public string Note { get; set; } = string.Empty;
 
-    [Display("Start Date"), JsonProperty("start_date")]
-    public DateTime StartDate { get; set; }
+    [Display("Start date"), JsonProperty("start_date")]
+    public DateTime? StartDate { get; set; }
 
-    [Display("Total Amount"), JsonProperty("total_amount")]
-    public decimal TotalAmount { get; set; }
+    [Display("Total amount"), JsonProperty("total_amount")]
+    public double? TotalAmount { get; set; }
 
     [Display("Employment ID"), JsonProperty("employment_id")]
     public string EmploymentId { get; set; } = string.Empty;
 
-    [Display("Next Invoice At"), JsonProperty("next_invoice_at")]
+    [Display("Next invoice At"), JsonProperty("next_invoice_at")]
     public DateTime? NextInvoiceAt { get; set; }
 
-    [Display("Number of Occurrences"), JsonProperty("nr_occurrences")]
-    public int NumberOfOccurrences { get; set; }
+    [Display("Number of occurrences"), JsonProperty("nr_occurrences")]
+    public int? NumberOfOccurrences { get; set; }
 
     [JsonProperty("periodicity")]
     public string Periodicity { get; set; } = string.Empty;

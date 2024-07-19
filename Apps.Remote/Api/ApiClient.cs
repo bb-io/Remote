@@ -19,8 +19,8 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
     {
         return ConfigureException(response);
     }
-    
-    public Exception ConfigureException(RestResponse response)
+
+    private Exception ConfigureException(RestResponse response)
     {
         string errorMessage = $"Status code: {response.StatusCode}, ";
 
@@ -28,13 +28,36 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
         {
             var responseObject = JsonConvert.DeserializeObject<JObject>(response.Content!)!;
 
-            if (responseObject["message"] is JObject messageObject)
+            if (responseObject["data"] is JObject dataObject)
             {
-                var code = messageObject["code"]?.ToString();
-                var message = messageObject["message"]?.ToString();
-                var param = messageObject["param"]?.ToString();
-            
-                errorMessage += $"Error code: {code}, Message: {message}, Parameter: {param}";
+                var failures = dataObject["failures"]?.ToObject<JArray>();
+                if (failures != null && failures.Count > 0)
+                {
+                    foreach (var failure in failures)
+                    {
+                        var number = failure["number"]?.ToString();
+                        var errors = failure["errors"]?.ToObject<JObject>();
+
+                        if (errors != null && errors.Count > 0)
+                        {
+                            errorMessage += $"Failure number: {number}, Errors: ";
+                            foreach (var error in errors)
+                            {
+                                var key = error.Key;
+                                var messages = error.Value?.ToObject<JArray>();
+
+                                if (messages != null && messages.Count > 0)
+                                {
+                                    errorMessage += $"{key}: {string.Join(", ", messages.Select(e => e.ToString()))}; ";
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    errorMessage += $"Message: No specific failure details found.";
+                }
             }
             else
             {
@@ -47,6 +70,6 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
             errorMessage += $"Content: {response.Content}";
         }
 
-        return new Exception(errorMessage);
+        return new Exception(errorMessage.Trim());
     }
 }
