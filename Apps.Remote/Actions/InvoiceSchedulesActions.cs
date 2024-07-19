@@ -181,7 +181,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         if (request.StartDateFrom.HasValue)
         {
-            apiRequest.AddParameter("start_date_from", request.StartDateFrom.Value.ToString("yyyy-MM-dd"), ParameterType.QueryString);
+            apiRequest.AddParameter("start_date_from", request.StartDateFrom.Value.ToUniversalTime().ToString("yyyy-MM-dd"), ParameterType.QueryString);
         }
 
         if (request.StartDateTo.HasValue)
