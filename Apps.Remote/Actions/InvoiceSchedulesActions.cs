@@ -6,6 +6,7 @@ using Apps.Remote.Models.Dtos;
 using Apps.Remote.Models.Identifiers;
 using Apps.Remote.Models.Requests.InvoiceSchedules;
 using Apps.Remote.Models.Responses.InvoiceSchedules;
+using Apps.Remote.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -151,7 +152,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             Note = request.Description ??
                    $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
             NrOccurrences = request.NrOccurrences ?? 1,
-            Number = invoiceToImport.InvoiceNumber
+            Number = request.Number ?? StringExtensions.ToRemoteNumberFormat(invoiceToImport.InvoiceNumber)
         };
 
         return await CreateInvoiceSchedule(createRequest);
