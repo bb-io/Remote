@@ -80,7 +80,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         var body = new Dictionary<string, object>()
         {
             { "country_code", request.CountryCode },
-            { "type", request.Type ?? "employee" }
+            { "type", string.IsNullOrEmpty(request.Type) ? "employee" : request.Type }
         };
 
         if (!string.IsNullOrEmpty(request.CompanyId))

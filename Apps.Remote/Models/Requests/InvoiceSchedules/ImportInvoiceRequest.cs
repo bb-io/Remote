@@ -10,6 +10,7 @@ public class ImportInvoiceRequest : ContractorIdentifier
 {
     public FileReference File { get; set; } = new();
 
+    [Display("Note")]
     public string? Description { get; set; }
 
     [Display("Periodicity", Description = "Defines how often contractor invoices will be generated. By default we set it to 'monthly'"), StaticDataSource(typeof(PeriodicityDataSource))]

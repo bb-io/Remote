@@ -111,7 +111,9 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var invoice = invoiceScheduleResponses.Data!.InvoiceScheduleResponses.FirstOrDefault() ??
                       throw new Exception("Invoice schedule returned unexpected response.");
         invoice.SetItemAmountsAndDescriptions();
-        return invoice;
+        
+        await Task.Delay(1500); // wait for the invoice to be processed (usually takes less than 1 second)
+        return await GetInvoiceSchedule(new InvoiceScheduleIdentifier { InvoiceScheduleId = invoice.Id });
     }
 
     [Action("Import invoice schedules", Description = "Import сontractor invoice schedules from a JSON file")]
@@ -123,20 +125,21 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
         var invoiceToImport = invoicesDto.Invoices.First();
-
-        var result = int.TryParse(invoiceToImport.InvoiceNumber, out var number);
-        var apiNumber = request.Number ?? (result ? number.ToString() : "1");
-        var startDate = request.StartDate ?? (invoiceToImport.InvoiceDate < DateTime.Now
-            ? DateTime.Now.AddDays(7)
-            : invoiceToImport.InvoiceDate);
-
+        
+        var startDate = request.StartDate ?? invoiceToImport.InvoiceDate;
+        if (startDate < DateTime.Now)
+        {
+            throw new ArgumentException($"Start date must be in the future. But was {startDate}");
+        }
+        
         var amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList();
         var sum = amounts.Sum();
         if (sum < 100)
         {
             throw new ArgumentException("Sum of amounts must be greater than 100");
         }
-
+        
+        amounts = amounts.Select(amount => amount * 100).ToList();
         var createRequest = new CreateInvoiceScheduleRequest
         {
             EmploymentId = request.EmploymentId,
@@ -148,7 +151,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             Note = request.Description ??
                    $"Invoice imported from external system. Original invoice number: {invoiceToImport.InvoiceNumber}",
             NrOccurrences = request.NrOccurrences ?? 1,
-            Number = apiNumber
+            Number = invoiceToImport.InvoiceNumber
         };
 
         return await CreateInvoiceSchedule(createRequest);
