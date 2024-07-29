@@ -12,7 +12,7 @@ namespace Apps.Remote.Api;
 public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
     : BlackBirdRestClient(new RestClientOptions { BaseUrl = creds.GetUrl(), ThrowOnAnyError = false })
 {
-    protected override JsonSerializerSettings JsonSettings => 
+    protected override JsonSerializerSettings JsonSettings =>
         new() { MissingMemberHandling = MissingMemberHandling.Ignore };
 
     protected override Exception ConfigureErrorException(RestResponse response)
@@ -20,7 +20,7 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
         return ConfigureException(response);
     }
 
-    private Exception ConfigureException(RestResponse response)
+    public Exception ConfigureException(RestResponse response)
     {
         string errorMessage = $"Status code: {response.StatusCode}, ";
 
@@ -28,6 +28,7 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
         {
             var responseObject = JsonConvert.DeserializeObject<JObject>(response.Content!)!;
 
+            // Check if there's a 'data' object
             if (responseObject["data"] is JObject dataObject)
             {
                 var failures = dataObject["failures"]?.ToObject<JArray>();
@@ -57,6 +58,28 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
                 else
                 {
                     errorMessage += $"Message: No specific failure details found.";
+                }
+            }
+            // Check if there's an 'errors' object directly
+            else if (responseObject["errors"] is JObject errorsObject)
+            {
+                if (errorsObject.Count > 0)
+                {
+                    errorMessage += "Errors: ";
+                    foreach (var error in errorsObject)
+                    {
+                        var key = error.Key;
+                        var messages = error.Value?.ToObject<JArray>();
+
+                        if (messages != null && messages.Count > 0)
+                        {
+                            errorMessage += $"{key}: {string.Join(", ", messages.Select(e => e.ToString()))}; ";
+                        }
+                    }
+                }
+                else
+                {
+                    errorMessage += $"Message: No specific error details found.";
                 }
             }
             else
