@@ -108,7 +108,9 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             .WithJsonBody(body);
         
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
-        return response.Data?.Employment!;
+
+        await Task.Delay(1500);
+        return await GetEmployment(new EmploymentIdentifier { EmploymentId = response.Data?.Employment!.Id! });
     }
     
     [Action("Update employment", Description = "Update employment by ID with specified data")]
