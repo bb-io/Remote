@@ -10,7 +10,10 @@ public class EmploymentStatusDataSource : IStaticDataSourceHandler
         {
             { "created", "Created" },
             { "active", "Active" },
-            { "archived", "Archived" }
+            { "archived", "Archived" },
+            { "review", "Review" },
+            { "invited", "Invited" },
+            { "initiated", "Initiated" }
         };
     }
 }
