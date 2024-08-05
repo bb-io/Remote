@@ -51,6 +51,15 @@ Before you can connect you need to make sure that:
 - **Update invoice schedule** Update сontractor invoice schedule by ID with specified data.
 - **Import invoice schedule** Import сontractor invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
+### Time offs
+
+- **Get time off** returns details of a specific time off.
+- **Create time off** creates a new time off for the employee.
+
+### Expenses
+
+- **Create expense** creates a new expense.
+
 ## Events
 
 ### Employments

@@ -1,6 +1,5 @@
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Text;
 
 namespace Apps.Remote.Models.Responses.InvoiceSchedules;

@@ -1,7 +1,9 @@
+using Apps.Remote.Constants;
 using Apps.Remote.Models.Dtos;
-using Apps.Remote.Models.Responses.InvoiceSchedules;
+using Apps.Remote.Models.Responses;
 using Apps.Remote.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,14 +14,38 @@ namespace Apps.Remote.Api;
 public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
     : BlackBirdRestClient(new RestClientOptions { BaseUrl = creds.GetUrl(), ThrowOnAnyError = false })
 {
-    protected override JsonSerializerSettings JsonSettings =>
-        new() { MissingMemberHandling = MissingMemberHandling.Ignore };
+    private const int PageSize = 100;
+
+    protected override JsonSerializerSettings JsonSettings => JsonConfig.JsonSettings;
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
         return ConfigureException(response);
     }
 
+    public async Task<List<T>> Paginate<T, TV>(RestRequest request) where TV : PaginationResponse<T>
+    {
+        var result = new List<T>();
+        var currentPage = 1;
+        var baseUrl = request.Resource.SetQueryParameter("page_size", PageSize.ToString());
+        PaginationResponse<T> response;
+
+        do
+        {
+            request.Resource = baseUrl
+                .SetQueryParameter("page", currentPage.ToString());
+
+            response = (await ExecuteWithErrorHandling<BaseDto<TV>>(request)).Data!;
+
+            if (response?.Items != null)
+                result.AddRange(response.Items);
+
+            currentPage++;
+        } while (currentPage <= response.TotalPages);
+
+        return result;
+    }
+    
     public Exception ConfigureException(RestResponse response)
     {
         string errorMessage = $"Status code: {response.StatusCode}, ";
