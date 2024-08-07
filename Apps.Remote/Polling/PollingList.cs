@@ -16,7 +16,7 @@ namespace Apps.Remote.Polling;
 public class PollingList(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     private const int DefaultPageSize = 50;
-
+    
     [PollingEvent("On invoices status changed",
         Description = "Returns invoices that changed status after the last polling time")]
     public async Task<PollingEventResponse<PageMemory, InvoicesResponse>> OnInvoicesStatusChanged(
@@ -84,7 +84,7 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
 
             currentPage++;
         } while (currentPage <= invoiceResponse.TotalPages);
-
+        
         return new InvoicesResponse
         {
             TotalCount = allInvoices.Count,

@@ -19,7 +19,7 @@ public class ImportInvoiceRequest : ContractorIdentifier
     [Display("Number of occurrences", Description = "Count of invoices that should be generated during schedule lifetime")]
     public int? NrOccurrences { get; set; }
     
-    [Display("Number", Description = "Invoice identifier")]
+    [Display("Invoice number", Description = "Invoice identifier")]
     public string? Number { get; set; }
 
     [Display("Start date", Description = "Date of the first contractor invoice generation. If you will not specify it, it will be set to the current date + 7 days")]
