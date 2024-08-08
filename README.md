@@ -51,6 +51,8 @@ Before you can connect you need to make sure that:
 - **Update invoice schedule** Update сontractor invoice schedule by ID with specified data.
 - **Import invoice schedule** Import сontractor invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
+The Remote API processes amounts in cents rather than in the standard currency format. This means that any amount returned by the API will be in cents. For example, an amount of $800 will be represented as 80,000 cents in the API outputs.
+
 ### Time offs
 
 - **Get time off** returns details of a specific time off.
