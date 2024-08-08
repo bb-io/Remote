@@ -1,7 +1,3 @@
-using Apps.Remote.DataSourceHandlers;
-using Blackbird.Applications.Sdk.Common;
-using Blackbird.Applications.Sdk.Common.Dynamic;
-
 namespace Apps.Remote.Models.Requests.Expenses;
 
 public class CreateExpenseRequest
@@ -10,11 +6,25 @@ public class CreateExpenseRequest
 
     public int Amount { get; set; }
 
-    [Display("Currency", Description = "The three-letter code for the expense currency.")]
     public string Currency { get; set; }
 
-    [Display("Employment ID"), DataSource(typeof(EmploymentDataSource))]
     public string EmploymentId { get; set; }
 
-    [Display("Expense date")] public DateTime ExpenseDate { get; set; }
+    public string ExpenseDate { get; set; }
+
+    public ReceiptRequest Receipt { get; set; }
+
+    public CreateExpenseRequest(CreateExpenseInput input, byte[] fileBytes)
+    {
+        Title = input.Title;
+        Amount = input.Amount;
+        Currency = input.Currency;
+        EmploymentId = input.EmploymentId;
+        ExpenseDate = input.ExpenseDate.ToString("yyyy-MM-dd");
+        Receipt = new()
+        {
+            Name = input.ReceiptFile.Name,
+            Content = Convert.ToBase64String(fileBytes)
+        };
+    }
 }
