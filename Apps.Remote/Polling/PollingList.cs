@@ -23,21 +23,24 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
         PollingEventRequest<PageMemory> request,
         [PollingEventParameter] OnInvoicesStatusChangedRequest statusChangedRequest)
     {
-        if (request.Memory is null || request.Memory.LastPollingTime is null)
-        {
-            return new PollingEventResponse<PageMemory, InvoicesResponse>
-            {
-                FlyBird = false,
-                Memory = new PageMemory { LastPollingTime = DateTime.UtcNow },
-                Result = null
-            };
-        }
-
         var invoices = await SearchInvoices(new SearchInvoicesRequest { Status = statusChangedRequest.Status });
         var memories = request.Memory.PageMemoryDtos;
         var changedInvoices = invoices.Invoices!
             .Where(x => memories.All(m => m.Id != x.Id))
             .ToList();
+        
+        if (request.Memory is null)
+        {
+            return new PollingEventResponse<PageMemory, InvoicesResponse>
+            {
+                FlyBird = false,
+                Memory = new PageMemory 
+                { 
+                    PageMemoryDtos = changedInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status }).ToList()
+                },
+                Result = null
+            };
+        }
 
         if (changedInvoices.Count == 0)
         {
@@ -53,7 +56,7 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
         return new PollingEventResponse<PageMemory, InvoicesResponse>
         {
             FlyBird = true,
-            Memory = new PageMemory { PageMemoryDtos = memories, LastPollingTime = DateTime.UtcNow },
+            Memory = new PageMemory { PageMemoryDtos = memories },
             Result = new InvoicesResponse
             {
                 TotalCount = changedInvoices.Count,
