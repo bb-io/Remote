@@ -25,7 +25,50 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
     {
         try
         {
+            if (request.Memory is null)
+            {
+                return new PollingEventResponse<PageMemory, InvoicesResponse>
+                {
+                    FlyBird = false,
+                    Memory = new PageMemory(),
+                    Result = null
+                };
+            }
+
             var invoices = await SearchInvoices(new SearchInvoicesRequest { Status = statusChangedRequest.Status });
+            var memories = request.Memory.PageMemoryDtos;
+            var changedInvoices = invoices.Invoices!
+                .Where(x => memories.All(m => m.Id != x.Id))
+                .ToList();
+            await Logger.LogAsync(new { changedInvoices, invoices, memories });
+
+            if (changedInvoices.Count == 0)
+            {
+                return new PollingEventResponse<PageMemory, InvoicesResponse>
+                {
+                    FlyBird = false,
+                    Memory = request.Memory,
+                    Result = null
+                };
+            }
+        
+            memories.AddRange(changedInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status }));
+            await Logger.LogAsync(new { memories });
+
+            return new PollingEventResponse<PageMemory, InvoicesResponse>
+            {
+                FlyBird = true,
+                Memory = new PageMemory { PageMemoryDtos = memories },
+                Result = new InvoicesResponse
+                {
+                    TotalCount = changedInvoices.Count,
+                    CurrentPage = 1,
+                    TotalPages = 1,
+                    Invoices = changedInvoices
+                }
+            };
+            
+            /*var invoices = await SearchInvoices(new SearchInvoicesRequest { Status = statusChangedRequest.Status });
             var memories = request.Memory?.PageMemoryDtos ?? new List<PageMemoryDto>();
             var changedInvoices = invoices.Invoices!
                 .Where(x => memories.All(m => m.Id != x.Id))
@@ -69,7 +112,7 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
                     TotalPages = 1,
                     Invoices = changedInvoices
                 }
-            };
+            };*/
         }
         catch (Exception e)
         {
