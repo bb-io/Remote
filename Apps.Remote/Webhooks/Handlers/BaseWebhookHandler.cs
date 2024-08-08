@@ -24,7 +24,7 @@ public class BaseWebhookHandler(string subscribeEvent) : IWebhookEventHandler
             .WithJsonBody(body);
         var apiClient = new ApiClient(credentials);
         
-        var response = await apiClient.ExecuteWithErrorHandling<BaseDto<WebhookCallbackDto>>(request);
+        await apiClient.ExecuteWithErrorHandling<BaseDto<WebhookCallbackDto>>(request);
     }
 
     public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
