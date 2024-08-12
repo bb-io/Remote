@@ -70,6 +70,18 @@ The Remote API processes amounts in cents rather than in the standard currency f
 - **On employment onboarding completed** This event is triggered whenever an employment user has completed onboarding.
 - **On employment details updated** This event is triggered whenever an employment user's details are updated.
 - **On employment personal information updated** This event is triggered whenever an employment user's personal information is updated.
+- **On employment status deactivated** This event is triggered whenever an employment user status is updated to inactive.
+
+### Time offs
+
+- **On time off canceled** Triggers when a time off is canceled.
+- **On time off declined** Triggers when a time off is declined.
+- **On time off requested** Triggers when a time off is requested.
+- **On time off date changed** Triggers when a time off has its date changed.
+
+### Custom fields
+
+- **On custom field value updated** This event is triggered whenever a contract amendment employment request is fully executed.
 
 ### Invoices
 
