@@ -115,7 +115,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var invoice = invoiceSchedule.Data!.InvoiceScheduleResponses.FirstOrDefault() ??
                       throw new Exception("Invoice schedule returned unexpected response.");
         invoice.SetItemAmountsAndDescriptions();
-        
+
         await Task.Delay(1500); // wait for the invoice to be processed (usually takes less than 1 second)
         return await GetInvoiceSchedule(new InvoiceScheduleIdentifier { InvoiceScheduleId = invoice.Id });
     }
@@ -129,20 +129,20 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
 
         var invoicesDto = JsonConvert.DeserializeObject<BlackbirdInvoiceDto>(json)!;
         var invoiceToImport = invoicesDto.Invoices.First();
-        
+
         var startDate = request.StartDate ?? invoiceToImport.InvoiceDate;
         if (startDate < DateTime.Now)
         {
             throw new ArgumentException($"Start date must be in the future. But was {startDate}");
         }
-        
+
         var amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList();
         var sum = amounts.Sum();
         if (sum < 100)
         {
             throw new ArgumentException("Sum of amounts must be greater than 100");
         }
-        
+
         amounts = amounts.Select(amount => amount * 100).ToList();
         var createRequest = new CreateInvoiceScheduleRequest
         {
@@ -185,26 +185,31 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         }).ToList();
 
         var bodyDictionary = new Dictionary<string, object>();
-        
-        if(!string.IsNullOrEmpty(request.Currency))
+
+        if (!string.IsNullOrEmpty(request.Currency))
             bodyDictionary.Add("currency", request.Currency);
-        
-        if(!string.IsNullOrEmpty(request.Periodicity))
+
+        if (!string.IsNullOrEmpty(request.Periodicity))
             bodyDictionary.Add("periodicity", request.Periodicity);
-        
-        if(request.Amounts != null && request.Descriptions != null && request.Amounts.Count > 0 && request.Descriptions.Count > 0)
+
+        if (request.Amounts != null && request.Descriptions != null && request.Amounts.Count > 0 &&
+            request.Descriptions.Count > 0)
             bodyDictionary.Add("items", items);
-        
-        if(!string.IsNullOrEmpty(request.Note))
+
+        if (!string.IsNullOrEmpty(request.Note))
             bodyDictionary.Add("note", request.Note);
-        
-        if(request.NrOccurrences.HasValue)
+
+        if (request.NrOccurrences.HasValue)
             bodyDictionary.Add("nr_occurrences", request.NrOccurrences);
-        
-        if(!string.IsNullOrEmpty(request.Number))
+
+        if (!string.IsNullOrEmpty(request.Number))
             bodyDictionary.Add("number", request.Number);
-        
-        var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{request.InvoiceScheduleId}", Method.Patch, Creds)
+
+        if (request.StartDate.HasValue)
+            bodyDictionary.Add("start_date", request.StartDate.Value.ToUniversalTime().ToString("yyyy-MM-dd"));
+
+        var apiRequest = new ApiRequest($"/v1/contractor-invoice-schedules/{request.InvoiceScheduleId}", Method.Patch,
+                Creds)
             .WithJsonBody(bodyDictionary);
 
         var response = await Client.ExecuteWithErrorHandling<BaseDto<InvoiceScheduleDto>>(apiRequest);
