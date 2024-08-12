@@ -6,6 +6,6 @@ namespace Apps.Remote.Models.Identifiers;
 
 public class InvoiceScheduleIdentifier
 {
-    [Display("Invoice Schedule ID"), DataSource(typeof(InvoiceScheduleDataSource))]
+    [Display("Invoice schedule ID"), DataSource(typeof(InvoiceScheduleDataSource))]
     public string InvoiceScheduleId { get; set; } = string.Empty;
 }

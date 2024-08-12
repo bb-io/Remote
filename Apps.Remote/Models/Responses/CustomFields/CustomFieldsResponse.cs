@@ -1,5 +1,4 @@
 using Apps.Remote.Models.Dtos;
-using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
 namespace Apps.Remote.Models.Responses.CustomFields;

@@ -24,5 +24,6 @@ public class UpdateInvoiceScheduleRequest : InvoiceScheduleIdentifier
     [Display("Number of occurrences")]
     public int? NrOccurrences { get; set; }
     
+    [Display("Invoice number")]
     public string? Number { get; set; }
 }

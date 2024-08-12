@@ -16,28 +16,32 @@ namespace Apps.Remote.Polling;
 public class PollingList(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     private const int DefaultPageSize = 50;
-
+    
     [PollingEvent("On invoices status changed",
         Description = "Returns invoices that changed status after the last polling time")]
     public async Task<PollingEventResponse<PageMemory, InvoicesResponse>> OnInvoicesStatusChanged(
         PollingEventRequest<PageMemory> request,
         [PollingEventParameter] OnInvoicesStatusChangedRequest statusChangedRequest)
     {
-        if (request.Memory is null || request.Memory.LastPollingTime is null)
+        var invoices = await SearchInvoices(new SearchInvoicesRequest { Status = statusChangedRequest.Status });
+        var memories = request.Memory?.PageMemoryDtos ?? new List<PageMemoryDto>();
+        var changedInvoices = invoices.Invoices!
+            .Where(x => memories.All(m => m.Id != x.Id))
+            .ToList();
+            
+        if (request.Memory is null)
         {
             return new PollingEventResponse<PageMemory, InvoicesResponse>
             {
                 FlyBird = false,
-                Memory = new PageMemory { LastPollingTime = DateTime.UtcNow },
+                Memory = new PageMemory
+                {
+                    PageMemoryDtos = changedInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status })
+                        .ToList()
+                },
                 Result = null
             };
         }
-
-        var invoices = await SearchInvoices(new SearchInvoicesRequest { Status = statusChangedRequest.Status });
-        var memories = request.Memory.PageMemoryDtos;
-        var changedInvoices = invoices.Invoices!
-            .Where(x => memories.All(m => m.Id != x.Id))
-            .ToList();
 
         if (changedInvoices.Count == 0)
         {
@@ -48,12 +52,12 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
                 Result = null
             };
         }
-        
+
         memories.AddRange(changedInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status }));
         return new PollingEventResponse<PageMemory, InvoicesResponse>
         {
             FlyBird = true,
-            Memory = new PageMemory { PageMemoryDtos = memories, LastPollingTime = DateTime.UtcNow },
+            Memory = new PageMemory { PageMemoryDtos = memories },
             Result = new InvoicesResponse
             {
                 TotalCount = changedInvoices.Count,
@@ -84,7 +88,7 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
 
             currentPage++;
         } while (currentPage <= invoiceResponse.TotalPages);
-
+        
         return new InvoicesResponse
         {
             TotalCount = allInvoices.Count,

@@ -3,7 +3,6 @@ using Apps.Remote.Invocables;
 using Apps.Remote.Models.Responses.CustomFields;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
-using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.Remote.DataSourceHandlers;

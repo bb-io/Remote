@@ -51,6 +51,17 @@ Before you can connect you need to make sure that:
 - **Update invoice schedule** Update сontractor invoice schedule by ID with specified data.
 - **Import invoice schedule** Import сontractor invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
+The Remote API processes amounts in cents rather than in the standard currency format. This means that any amount returned by the API will be in cents. For example, an amount of $800 will be represented as 80,000 cents in the API outputs.
+
+### Time offs
+
+- **Get time off** returns details of a specific time off.
+- **Create time off** creates a new time off for the employee.
+
+### Expenses
+
+- **Create expense** creates a new expense.
+
 ## Events
 
 ### Employments
@@ -59,6 +70,18 @@ Before you can connect you need to make sure that:
 - **On employment onboarding completed** This event is triggered whenever an employment user has completed onboarding.
 - **On employment details updated** This event is triggered whenever an employment user's details are updated.
 - **On employment personal information updated** This event is triggered whenever an employment user's personal information is updated.
+- **On employment status deactivated** This event is triggered whenever an employment user status is updated to inactive.
+
+### Time offs
+
+- **On time off canceled** Triggers when a time off is canceled.
+- **On time off declined** Triggers when a time off is declined.
+- **On time off requested** Triggers when a time off is requested.
+- **On time off date changed** Triggers when a time off has its date changed.
+
+### Custom fields
+
+- **On custom field value updated** This event is triggered whenever a contract amendment employment request is fully executed.
 
 ### Invoices
 
