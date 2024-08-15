@@ -81,7 +81,7 @@ The Remote API processes amounts in cents rather than in the standard currency f
 
 ### Custom fields
 
-- **On custom field value updated** This event is triggered whenever a contract amendment employment request is fully executed.
+- **On custom field value updated** This event is triggered whenever a custom field value is updated.
 
 ### Invoices
 
