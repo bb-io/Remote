@@ -9,17 +9,19 @@ namespace Apps.Remote.Models.Requests.Expenses;
 
 public class CreateExpenseInput
 {
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     public int Amount { get; set; }
 
     [Display("Currency", Description = "The three-letter code for the expense currency."), StaticDataSource(typeof(CurrencyDataSource))]
-    public string Currency { get; set; }
+    public string Currency { get; set; } = string.Empty;
 
     [Display("Employment ID"), DataSource(typeof(EmploymentDataSource))]
-    public string EmploymentId { get; set; }
+    public string EmploymentId { get; set; } = string.Empty;
 
-    [Display("Expense date")] public DateTime ExpenseDate { get; set; }
+    [Display("Expense date")] 
+    public DateTime ExpenseDate { get; set; }
     
-    [Display("Receipt file")] public FileReference ReceiptFile { get; set; }
+    [Display("Receipt file")] 
+    public FileReference ReceiptFile { get; set; } = new();
 }
