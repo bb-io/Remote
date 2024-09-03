@@ -30,6 +30,11 @@ public class TimeOffWebhookList(InvocationContext invocationContext) : AppInvoca
     public Task<WebhookResponse<TimeOffResponse>> OnTimeOffRequested(WebhookRequest webhookRequest) =>
         HandleEmploymentWebhook(webhookRequest);
     
+    [Webhook("On time off approved", typeof(TimeOffApprovedHandler),
+        Description = "Triggers when a time off is approved")]
+    public Task<WebhookResponse<TimeOffResponse>> OnTimeOffApproved(WebhookRequest webhookRequest) =>
+        HandleEmploymentWebhook(webhookRequest);
+    
     [Webhook("On time off date changed", typeof(TimeOffDateChangedHandler),
         Description = "Triggers when a time off has its date changed")]
     public Task<WebhookResponse<TimeOffResponse>> OnTimeOffDateChanged(WebhookRequest webhookRequest) =>
