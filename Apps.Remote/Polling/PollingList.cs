@@ -72,49 +72,59 @@ public class PollingList(InvocationContext invocationContext) : AppInvocable(inv
     public async Task<PollingEventResponse<PageMemory, InvoicesResponse>> OnInvoiceAdded(
         PollingEventRequest<PageMemory> request)
     {
-        var invoices = await SearchInvoices(new SearchInvoicesRequest());
-        var memories = request.Memory?.PageMemoryDtos ?? new List<PageMemoryDto>();
-        var newInvoices = invoices.Invoices!
-            .Where(x => memories.All(m => m.Id != x.Id))
-            .ToList();
-
-        if (request.Memory is null)
+        try
         {
-            return new PollingEventResponse<PageMemory, InvoicesResponse>
+            var invoices = await SearchInvoices(new SearchInvoicesRequest());
+            var memories = request.Memory?.PageMemoryDtos ?? new List<PageMemoryDto>();
+            var newInvoices = invoices.Invoices!
+                .Where(x => memories.All(m => m.Id != x.Id))
+                .ToList();
+
+            await Logger.LogAsync(new { Memory = request.Memory, NewInvoices = newInvoices });
+
+            if (request.Memory is null)
             {
-                FlyBird = false,
-                Memory = new PageMemory
+                return new PollingEventResponse<PageMemory, InvoicesResponse>
                 {
-                    PageMemoryDtos = newInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status })
-                        .ToList()
-                },
-                Result = null
-            };
-        }
+                    FlyBird = false,
+                    Memory = new PageMemory
+                    {
+                        PageMemoryDtos = newInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status })
+                            .ToList()
+                    },
+                    Result = null
+                };
+            }
 
-        if (newInvoices.Count == 0)
-        {
+            if (newInvoices.Count == 0)
+            {
+                return new PollingEventResponse<PageMemory, InvoicesResponse>
+                {
+                    FlyBird = false,
+                    Memory = request.Memory,
+                    Result = null
+                };
+            }
+
+            memories.AddRange(newInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status }));
             return new PollingEventResponse<PageMemory, InvoicesResponse>
             {
-                FlyBird = false,
-                Memory = request.Memory,
-                Result = null
+                FlyBird = true,
+                Memory = new PageMemory { PageMemoryDtos = memories },
+                Result = new InvoicesResponse
+                {
+                    TotalCount = newInvoices.Count,
+                    CurrentPage = 1,
+                    TotalPages = 1,
+                    Invoices = newInvoices
+                }
             };
         }
-
-        memories.AddRange(newInvoices.Select(x => new PageMemoryDto { Id = x.Id, Status = x.Status }));
-        return new PollingEventResponse<PageMemory, InvoicesResponse>
-        {
-            FlyBird = true,
-            Memory = new PageMemory { PageMemoryDtos = memories },
-            Result = new InvoicesResponse
-            {
-                TotalCount = newInvoices.Count,
-                CurrentPage = 1,
-                TotalPages = 1,
-                Invoices = newInvoices
-            }
-        };
+        catch (Exception e)
+        {            
+            await Logger.LogAsync(e);
+            throw;
+        }
     }
     
     private async Task<InvoicesResponse> SearchInvoices([ActionParameter] SearchInvoicesRequest request)
