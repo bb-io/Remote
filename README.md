@@ -57,10 +57,14 @@ The Remote API processes amounts in cents rather than in the standard currency f
 
 - **Get time off** returns details of a specific time off.
 - **Create time off** creates a new time off for the employee.
+- **Get time off balance** returns the time off balance for the employee.
 
 ### Expenses
 
+- **Get expenses** returns all expenses.
+- **Get expense** returns details of a specific expense.
 - **Create expense** creates a new expense.
+- **Download receipt** downloads a receipt file for an expense.
 
 ## Events
 
@@ -78,6 +82,7 @@ The Remote API processes amounts in cents rather than in the standard currency f
 - **On time off declined** Triggers when a time off is declined.
 - **On time off requested** Triggers when a time off is requested.
 - **On time off date changed** Triggers when a time off has its date changed.
+- **On time off approved** Triggers when a time off is approved.
 
 ### Custom fields
 
@@ -86,6 +91,7 @@ The Remote API processes amounts in cents rather than in the standard currency f
 ### Invoices
 
 - **On invoices status changed** This event returns invoices that changed status since the last polling time. 
+- **On contractor invoice added** This event is triggered whenever a new contractor invoice is added.
 
 Note: Invoice events are based on polling. This means that the event will be triggered based on the polling interval you set in the event configuration.
 
