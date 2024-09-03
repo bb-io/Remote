@@ -16,7 +16,7 @@ namespace Apps.Remote.Webhooks;
 public class Webhooks(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     [Webhook("On custom field value updated", typeof(CustomFieldValueUpdatedHandler),
-        Description = "This event is triggered whenever a contract amendment employment request is fully executed")]
+        Description = "This event is triggered whenever a custom field value is updated")]
     public async Task<WebhookResponse<CustomFieldValueResponse>> OnCustomFieldValueUpdated(
         WebhookRequest webhookRequest)
     {

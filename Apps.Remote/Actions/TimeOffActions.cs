@@ -24,6 +24,14 @@ public class TimeOffActions(InvocationContext invocationContext) : AppInvocable(
 
         return response.Data?.Timeoff!;
     }
+    
+    [Action("Get time off balance", Description = "Get the time off balance of a specific employee")]
+    public async Task<TimeOffBalanceResponse> GetTimeOffBalance([ActionParameter] EmploymentIdentifier identifier)
+    {
+        var apiRequest = new ApiRequest($"/v1/timeoff-balances/{identifier.EmploymentId}", Method.Get, Creds);
+        var response = await Client.ExecuteWithErrorHandling<BaseDto<TimeOffBalanceRootDto>>(apiRequest);
+        return new(response.Data!.TimeoffBalance);
+    }
 
     [Action("Create time off", Description = "Create a new time off")]
     public async Task<TimeOffResponse> CreateTimeOff([ActionParameter] CreateTimeOffInput input)
