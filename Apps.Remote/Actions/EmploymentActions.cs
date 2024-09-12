@@ -5,10 +5,13 @@ using Apps.Remote.Models.Identifiers;
 using Apps.Remote.Models.Requests.Employments;
 using Apps.Remote.Models.Responses.CustomFields;
 using Apps.Remote.Models.Responses.Employments;
+using Apps.Remote.Models.Responses.Schemas;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Apps.Remote.Actions;
@@ -17,7 +20,7 @@ namespace Apps.Remote.Actions;
 public class EmploymentActions(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     private const int PageSize = 50;
-    
+
     [Action("Search employments", Description = "Search employments based on specified criteria")]
     public async Task<EmploymentsResponse> SearchEmployments([ActionParameter] SearchEmploymentsRequest request)
     {
@@ -47,18 +50,20 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             Employments = allEmployments
         };
     }
-    
+
     [Action("Get employment", Description = "Get employment by ID")]
     public async Task<EmploymentResponse> GetEmployment([ActionParameter] EmploymentIdentifier identifier)
     {
         var apiRequest = new ApiRequest($"/v1/employments/{identifier.EmploymentId}", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
+        response.Data?.Employment.SetContractDetails();
 
         return response.Data?.Employment!;
     }
-    
+
     [Action("Get employment custom field", Description = "Get employment custom field value by ID")]
-    public async Task<CustomFieldValueResponse> GetEmploymentCustomFieldValue([ActionParameter] CustomFieldIdentifier customFieldIdentifier,
+    public async Task<CustomFieldValueResponse> GetEmploymentCustomFieldValue(
+        [ActionParameter] CustomFieldIdentifier customFieldIdentifier,
         [ActionParameter] EmploymentIdentifier employmentIdentifier)
     {
         var endpoint =
@@ -70,9 +75,10 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             response.Data.CustomFieldValue.Value ??= string.Empty;
         }
 
-        return response.Data?.CustomFieldValue ?? new CustomFieldValueResponse() { CustomFieldId = customFieldIdentifier.CustomFieldId, Value = string.Empty };
+        return response.Data?.CustomFieldValue ?? new CustomFieldValueResponse()
+            { CustomFieldId = customFieldIdentifier.CustomFieldId, Value = string.Empty };
     }
-    
+
     [Action("Create employment", Description = "Create employment with specified data")]
     public async Task<EmploymentResponse> CreateEmployment([ActionParameter] CreateEmploymentRequest request)
     {
@@ -87,7 +93,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         {
             body.Add("company_id", request.CompanyId);
         }
-        
+
         var basicInformation = new Dictionary<string, object>
         {
             { "email", request.Email },
@@ -96,50 +102,111 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             { "provisional_start_date", request.ProvisionalStartDate.ToString("yyyy-MM-dd") },
             { "has_seniority_date", hasSeniorityDate ? "yes" : "no" }
         };
-        
+
         if (hasSeniorityDate)
         {
             basicInformation.Add("seniority_date", request.SeniorityDate!.Value.ToString("yyyy-MM-dd"));
         }
-        
+
         body.Add("basic_information", basicInformation);
-        
+
         var apiRequest = new ApiRequest("/v1/employments", Method.Post, Creds)
             .WithJsonBody(body);
-        
+
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
 
         await Task.Delay(1500);
         return await GetEmployment(new EmploymentIdentifier { EmploymentId = response.Data?.Employment!.Id! });
     }
-    
+
     [Action("Update employment", Description = "Update employment by ID with specified data")]
-    public async Task<EmploymentResponse> UpdateEmployment([ActionParameter] UpdateEmploymentRequest employmentDto)
+    public async Task<EmploymentResponse> UpdateEmployment(
+        [ActionParameter] UpdateEmploymentRequest updateEmploymentRequest)
     {
         var body = new Dictionary<string, object>();
-        
-        if (!string.IsNullOrEmpty(employmentDto.FullName))
+
+        if (!string.IsNullOrEmpty(updateEmploymentRequest.FullName))
         {
-            body.Add("full_name", employmentDto.FullName);
+            body.Add("full_name", updateEmploymentRequest.FullName);
         }
-        
-        if (!string.IsNullOrEmpty(employmentDto.JobTitle))
+
+        if (!string.IsNullOrEmpty(updateEmploymentRequest.JobTitle))
         {
-            body.Add("job_title", employmentDto.JobTitle);
+            body.Add("job_title", updateEmploymentRequest.JobTitle);
         }
-        
-        if (!string.IsNullOrEmpty(employmentDto.PersonalEmail))
+
+        if (!string.IsNullOrEmpty(updateEmploymentRequest.PersonalEmail))
         {
-            body.Add("personal_email", employmentDto.PersonalEmail);
+            body.Add("personal_email", updateEmploymentRequest.PersonalEmail);
         }
-        
-        var apiRequest = new ApiRequest($"/v1/employments/{employmentDto.EmploymentId}", Method.Patch, Creds)
+
+        if (!string.IsNullOrEmpty(updateEmploymentRequest.PricingPlanFrequency))
+        {
+            body.Add("pricing_plan_details", new
+            {
+                frequency = updateEmploymentRequest.PricingPlanFrequency
+            });
+        }
+
+        if (updateEmploymentRequest.ShouldChangeContractDetails())
+        {
+            var employment = await GetEmployment(new EmploymentIdentifier
+                { EmploymentId = updateEmploymentRequest.EmploymentId });
+            var contractDetails = employment.ContractDetails ?? new JObject();
+            var mergedContractDetails = updateEmploymentRequest.MergeContractDetails();
+
+            var contractDetailsRequest =
+                new ApiRequest($"/v1/countries/{updateEmploymentRequest.CountryCode}/contract_details", Method.Get,
+                    Creds);
+            var contractDetailsResponse =
+                await Client.ExecuteWithErrorHandling<BaseDto<FormSchemaResponse>>(contractDetailsRequest);
+            var properties = contractDetailsResponse.Data?.Properties;
+
+            var result = new Dictionary<string, object>();
+            if (properties != null)
+            {
+                foreach (var property in properties)
+                {
+                    var item = mergedContractDetails.FirstOrDefault(x => x.Key.Contains(property.Key));
+                    if (item.Key != null)
+                    {
+                        var type = item.Key.Split(']')[0].Substring(1);
+                        var key = item.Key.Split(']')[1];
+                        var nested = key.Contains('.');
+                        if (nested)
+                        {
+                            var rootKey = key.Split('.')[0];
+                            var nestedKey = key.Split('.')[1];
+                            var jObject = new JObject();
+                            var innerJObject = new JObject { { nestedKey, mergedContractDetails[item.Key] } };
+                            jObject.Add(rootKey, innerJObject);
+                            
+                            result.Add(rootKey, jObject); // ??
+                        }
+                        else
+                        {
+                            result.Add(property.Key, type == "number"
+                                ? Convert.ToInt32(mergedContractDetails[key])
+                                : mergedContractDetails[item.Key]);
+                        }
+                    }
+                    else
+                    {
+                        result.Add(property.Key, contractDetails[property.Key]!);
+                    }
+                }
+            }
+
+            body.Add("contract_details", result);
+        }
+
+        var apiRequest = new ApiRequest($"/v1/employments/{updateEmploymentRequest.EmploymentId}", Method.Patch, Creds)
             .WithJsonBody(body);
-        
+
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
         return response.Data?.Employment!;
     }
-    
+
     [Action("Invite employment", Description = "Invite employment by ID to start the self-enrollment")]
     public async Task InviteEmployment([ActionParameter] EmploymentIdentifier identifier)
     {
