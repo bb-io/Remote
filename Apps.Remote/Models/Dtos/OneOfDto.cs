@@ -7,6 +7,6 @@ public class OneOfDto
     [JsonProperty("const")]
     public string Constant { get; set; } = string.Empty;
     
-    [JsonProperty("description")]
+    [JsonProperty("title")]
     public string Title { get; set; } = string.Empty;
 }
