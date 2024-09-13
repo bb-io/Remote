@@ -88,7 +88,7 @@ public class ContractDetailsKeysDataSource(
 
                 if (nestedPropertyValue?["type"]?.ToString().Contains("null") == true)
                 {
-                    result.Add(cleanedPropertyName, $"nullable {nestedPropertyTitle}");
+                    result.Add(cleanedPropertyName, $"(Nullable) {nestedPropertyTitle}");
                 }
                 else
                 {
