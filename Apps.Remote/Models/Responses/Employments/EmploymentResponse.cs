@@ -42,6 +42,7 @@ public class EmploymentResponse
     public void SetContractDetails()
     {
         ContractDetailsResponse = ContractDetails?.ToObject<ContractDetailsResponse>()!;
+        ContractDetailsResponse.Fields = ContractDetails?.ToString()!;
     }
 }
 
@@ -55,4 +56,7 @@ public class ContractDetailsResponse
 {
     [Display("Annual gross salary"), JsonProperty("annual_gross_salary")]
     public int AnnualGrossSalary { get; set; }
+
+    [Display("Fields (JSON)")]
+    public string Fields { get; set; }
 }

@@ -40,7 +40,6 @@ public class ContractDetailsKeysDataSource(
 
                 var propertyTitle = propertyValue?["title"]?.ToString() ?? propertyName;
 
-                // Clean the key and check for null in the type
                 var propertyNameWithType = CleanPropertyName($"[{propertyValue["type"]}]{propertyName}");
                 
                 if (propertyValue?["properties"] != null)
@@ -50,7 +49,6 @@ public class ContractDetailsKeysDataSource(
                 }
                 else
                 {
-                    // If the type includes null, prepend 'nullable ' to the title
                     if (propertyValue?["type"]?.ToString().Contains("null") == true)
                     {
                         result.Add(propertyNameWithType, $"(Nullable) {propertyTitle}");
@@ -88,7 +86,6 @@ public class ContractDetailsKeysDataSource(
             {
                 var cleanedPropertyName = CleanPropertyName($"[{nestedPropertyValue?["type"]}]{fullPropertyName}");
 
-                // Handle nullability in nested properties as well
                 if (nestedPropertyValue?["type"]?.ToString().Contains("null") == true)
                 {
                     result.Add(cleanedPropertyName, $"nullable {nestedPropertyTitle}");
@@ -101,21 +98,17 @@ public class ContractDetailsKeysDataSource(
         }
     }
 
-    // Keep the existing CleanPropertyName method to clean up whitespaces and other characters
     private string CleanPropertyName(string propertyName)
     {
-        // Remove newlines, trim excess spaces, and remove quotes
         var cleanedName = propertyName
-            .Replace("\r\n", "")  // Remove \r\n
-            .Replace("\n", "")    // Remove any other newlines
-            .Replace("\r", "")    // Remove carriage returns
-            .Replace("\"", "")    // Remove quotes
-            .Trim();              // Remove leading/trailing spaces
+            .Replace("\r\n", "")
+            .Replace("\n", "")   
+            .Replace("\r", "")    
+            .Replace("\"", "")  
+            .Trim();            
 
-        // Remove excess spaces inside the key
-        cleanedName = Regex.Replace(cleanedName, @"\s+", " ");  // Replace multiple spaces with a single space
+        cleanedName = Regex.Replace(cleanedName, @"\s+", " "); 
 
-        // Further clean specific parts like inside the [[...]] pattern
         cleanedName = cleanedName.Replace("[[ ", "[[")
                                  .Replace(" ]]", "]]")
                                  .Replace(", ", ",");

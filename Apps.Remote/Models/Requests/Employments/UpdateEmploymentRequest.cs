@@ -27,7 +27,7 @@ public class UpdateEmploymentRequest : CountryIdentifier
     [Display("Contract details keys"), DataSource(typeof(ContractDetailsKeysDataSource))]
     public IEnumerable<string>? ContractDetailsKeys { get; set; }
     
-    [Display("Contract details values")]
+    [Display("Contract details values"), DataSource(typeof(ContractDetailsValuesDataSource))]
     public IEnumerable<string>? ContractDetailsValues { get; set; }
 
     public bool ShouldChangeContractDetails()

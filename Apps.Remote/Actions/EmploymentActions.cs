@@ -10,7 +10,6 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 
@@ -169,7 +168,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
                 {
                     var matchingItems = mergedContractDetails
                         .Where(x => x.Key.Contains(property
-                            .Key)) // Get all items for the current property key (supports nested)
+                            .Key))
                         .ToList();
 
                     foreach (var item in matchingItems)
@@ -180,11 +179,9 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
                         var nested = key.Contains('.');
                         if (nested)
                         {
-                            // Process nested properties
                             var rootKey = key.Split('.')[0];
                             var nestedKey = key.Split('.')[1];
 
-                            // Check if the root key already exists in the result
                             if (!result.ContainsKey(rootKey))
                             {
                                 result[rootKey] = new JObject();
@@ -197,14 +194,12 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
                         }
                         else
                         {
-                            // Process non-nested properties
                             result[key] = type.Contains("integer") || type.Contains("number")
                                 ? Convert.ToInt32(mergedContractDetails[item.Key])
                                 : mergedContractDetails[item.Key];
                         }
                     }
 
-                    // Add existing value from the current contract details if the property wasn't updated
                     if (!result.ContainsKey(property.Key))
                     {
                         var existingValue = contractDetails[property.Key];
@@ -223,6 +218,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             .WithJsonBody(body);
 
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
+        response.Data?.Employment.SetContractDetails();
         return response.Data?.Employment!;
     }
 
