@@ -167,39 +167,58 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             {
                 foreach (var property in properties)
                 {
-                    var item = mergedContractDetails.FirstOrDefault(x => x.Key.Contains(property.Key));
-                    if (item.Key != null)
+                    var matchingItems = mergedContractDetails
+                        .Where(x => x.Key.Contains(property
+                            .Key)) // Get all items for the current property key (supports nested)
+                        .ToList();
+
+                    foreach (var item in matchingItems)
                     {
                         var type = item.Key.Split(']')[0].Substring(1);
-                        var key = item.Key.Split(']')[1];
+                        var key = item.Key.Substring(item.Key.LastIndexOf(']') + 1);
+
                         var nested = key.Contains('.');
                         if (nested)
                         {
+                            // Process nested properties
                             var rootKey = key.Split('.')[0];
                             var nestedKey = key.Split('.')[1];
-                            var jObject = new JObject();
-                            var innerJObject = new JObject { { nestedKey, mergedContractDetails[item.Key] } };
-                            jObject.Add(rootKey, innerJObject);
-                            
-                            result.Add(rootKey, jObject); // ??
+
+                            // Check if the root key already exists in the result
+                            if (!result.ContainsKey(rootKey))
+                            {
+                                result[rootKey] = new JObject();
+                            }
+
+                            var innerJObject = (JObject)result[rootKey];
+                            innerJObject[nestedKey] = type.Contains("integer") || type.Contains("number")
+                                ? Convert.ToInt32(mergedContractDetails[item.Key])
+                                : mergedContractDetails[item.Key];
                         }
                         else
                         {
-                            result.Add(property.Key, type == "number"
-                                ? Convert.ToInt32(mergedContractDetails[key])
-                                : mergedContractDetails[item.Key]);
+                            // Process non-nested properties
+                            result[key] = type.Contains("integer") || type.Contains("number")
+                                ? Convert.ToInt32(mergedContractDetails[item.Key])
+                                : mergedContractDetails[item.Key];
                         }
                     }
-                    else
+
+                    // Add existing value from the current contract details if the property wasn't updated
+                    if (!result.ContainsKey(property.Key))
                     {
-                        result.Add(property.Key, contractDetails[property.Key]!);
+                        var existingValue = contractDetails[property.Key];
+                        if (existingValue != null)
+                        {
+                            result.Add(property.Key, existingValue);
+                        }
                     }
                 }
             }
 
             body.Add("contract_details", result);
         }
-
+        
         var apiRequest = new ApiRequest($"/v1/employments/{updateEmploymentRequest.EmploymentId}", Method.Patch, Creds)
             .WithJsonBody(body);
 

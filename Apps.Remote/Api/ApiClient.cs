@@ -45,7 +45,7 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
 
         return result;
     }
-    
+
     public Exception ConfigureException(RestResponse response)
     {
         string errorMessage = $"Status code: {response.StatusCode}, ";
@@ -83,7 +83,7 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
                 }
                 else
                 {
-                    errorMessage += $"Message: No specific failure details found.";
+                    errorMessage += "Message: No specific failure details found.";
                 }
             }
             // Check if there's an 'errors' object directly
@@ -95,17 +95,26 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
                     foreach (var error in errorsObject)
                     {
                         var key = error.Key;
-                        var messages = error.Value?.ToObject<JArray>();
+                        var messages = error.Value?.ToObject<JObject>();
 
-                        if (messages != null && messages.Count > 0)
+                        if (messages != null)
                         {
-                            errorMessage += $"{key}: {string.Join(", ", messages.Select(e => e.ToString()))}; ";
+                            foreach (var message in messages)
+                            {
+                                var fieldName = message.Key;
+                                var fieldErrors = message.Value.ToObject<JArray>();
+                                if (fieldErrors != null)
+                                {
+                                    errorMessage +=
+                                        $"{key}.{fieldName}: {string.Join(", ", fieldErrors.Select(e => e.ToString()))}; ";
+                                }
+                            }
                         }
                     }
                 }
                 else
                 {
-                    errorMessage += $"Message: No specific error details found.";
+                    errorMessage += "Message: No specific error details found.";
                 }
             }
             else

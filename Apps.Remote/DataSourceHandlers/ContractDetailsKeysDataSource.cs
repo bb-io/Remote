@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Apps.Remote.Api;
 using Apps.Remote.Invocables;
 using Apps.Remote.Models.Dtos;
@@ -39,7 +40,9 @@ public class ContractDetailsKeysDataSource(
 
                 var propertyTitle = propertyValue?["title"]?.ToString() ?? propertyName;
 
-                var propertyNameWithType = $"[{propertyValue["type"]}]{propertyName}";
+                // Clean the key and check for null in the type
+                var propertyNameWithType = CleanPropertyName($"[{propertyValue["type"]}]{propertyName}");
+                
                 if (propertyValue?["properties"] != null)
                 {
                     var nestedProperties = propertyValue["properties"] as JObject;
@@ -47,7 +50,15 @@ public class ContractDetailsKeysDataSource(
                 }
                 else
                 {
-                    result.Add(propertyNameWithType, propertyTitle);
+                    // If the type includes null, prepend 'nullable ' to the title
+                    if (propertyValue?["type"]?.ToString().Contains("null") == true)
+                    {
+                        result.Add(propertyNameWithType, $"(Nullable) {propertyTitle}");
+                    }
+                    else
+                    {
+                        result.Add(propertyNameWithType, propertyTitle);
+                    }
                 }
             }
         }
@@ -75,8 +86,40 @@ public class ContractDetailsKeysDataSource(
             }
             else
             {
-                result.Add($"[{nestedPropertyValue?["type"]}]{fullPropertyName}", nestedPropertyTitle);
+                var cleanedPropertyName = CleanPropertyName($"[{nestedPropertyValue?["type"]}]{fullPropertyName}");
+
+                // Handle nullability in nested properties as well
+                if (nestedPropertyValue?["type"]?.ToString().Contains("null") == true)
+                {
+                    result.Add(cleanedPropertyName, $"nullable {nestedPropertyTitle}");
+                }
+                else
+                {
+                    result.Add(cleanedPropertyName, nestedPropertyTitle);
+                }
             }
         }
+    }
+
+    // Keep the existing CleanPropertyName method to clean up whitespaces and other characters
+    private string CleanPropertyName(string propertyName)
+    {
+        // Remove newlines, trim excess spaces, and remove quotes
+        var cleanedName = propertyName
+            .Replace("\r\n", "")  // Remove \r\n
+            .Replace("\n", "")    // Remove any other newlines
+            .Replace("\r", "")    // Remove carriage returns
+            .Replace("\"", "")    // Remove quotes
+            .Trim();              // Remove leading/trailing spaces
+
+        // Remove excess spaces inside the key
+        cleanedName = Regex.Replace(cleanedName, @"\s+", " ");  // Replace multiple spaces with a single space
+
+        // Further clean specific parts like inside the [[...]] pattern
+        cleanedName = cleanedName.Replace("[[ ", "[[")
+                                 .Replace(" ]]", "]]")
+                                 .Replace(", ", ",");
+
+        return cleanedName;
     }
 }
