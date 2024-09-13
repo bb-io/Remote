@@ -1,5 +1,6 @@
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Apps.Remote.Models.Responses.Employments;
 
@@ -28,4 +29,34 @@ public class EmploymentResponse
 
     [Display("Department ID"), JsonProperty("department_id")]
     public string DepartmentId { get; set; } = string.Empty;
+
+    [Display("Pricing plan details"), JsonProperty("pricing_plan_details")]
+    public PricingPlanDetailsResponse PricingPlanDetails { get; set; } = new();
+
+    [JsonProperty("contract_details"), DefinitionIgnore]
+    public JObject? ContractDetails { get; set; }
+
+    [Display("Contract details"), JsonProperty("contract_details_response")]
+    public ContractDetailsResponse ContractDetailsResponse { get; set; } = new();
+    
+    public void SetContractDetails()
+    {
+        ContractDetailsResponse = ContractDetails?.ToObject<ContractDetailsResponse>()!;
+        ContractDetailsResponse.Fields = ContractDetails?.ToString()!;
+    }
+}
+
+public class PricingPlanDetailsResponse
+{
+    [JsonProperty("frequency")]
+    public string Frequency { get; set; } = string.Empty;
+}
+
+public class ContractDetailsResponse
+{
+    [Display("Annual gross salary"), JsonProperty("annual_gross_salary")]
+    public int AnnualGrossSalary { get; set; }
+
+    [Display("Fields (JSON)")]
+    public string Fields { get; set; }
 }

@@ -34,9 +34,19 @@ Before you can connect you need to make sure that:
 - **Search employments** Search employments based on specified criteria.
 - **Get employment** Get employment by ID.
 - **Create employment** Create employment with specified data.
-- **Update employment** Update employment by ID with specified data.
-- **Invite employment** Invite employment by ID to start the self-enrollment
-- **Get employment custom field** Get employment custom field value by ID
+- **Invite employment** Invite employment by ID to start the self-enrollment.
+- **Get employment custom field** Get employment custom field value by ID.
+- **Update employment** Update employment by ID with specified data. This action allows you to update employment details by ID with the provided data. When working with contract details, please note that the required properties can vary based on the employee's country.
+
+Steps:
+
+1. Country code: Specify the country code for the employee. This is crucial because each country may require different contract details.
+2. Contract details keys (Optional Input): After selecting a country code, a dynamic dropdown will appear allowing you to select relevant contract details keys.
+3. Contract details values (Optional Input): Alongside the keys, you must specify the values corresponding to each key. The order of keys and values must match exactly, as they will be merged into an object in the code.
+
+Example:
+
+![example](./image/README/UpdateEmploymentExample.png)
 
 ### Invoices
 
@@ -52,6 +62,7 @@ Before you can connect you need to make sure that:
 - **Import invoice schedule** Import сontractor invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
 The Remote API processes amounts in cents rather than in the standard currency format. This means that any amount returned by the API will be in cents. For example, an amount of $800 will be represented as 80,000 cents in the API outputs.
+
 
 ### Time offs
 
