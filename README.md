@@ -8,6 +8,8 @@ Blackbird is the new automation backbone for the language technology industry. B
 
 **Remote** is a Global HR Platform that helps companies hire, manage, and pay their entire team — and more effectively compete in the modern global economy through our comprehensive set of core solutions including, HRIS, payroll, international employment, contractor management, and more.
 
+Also see support docs from Remote.com [here](https://support.remote.com/hc/en-us/articles/30035877720973-Blackbird-Remote-Connector).
+
 ## Before setting up
 
 Before you can connect you need to make sure that:
@@ -47,6 +49,8 @@ Steps:
 Example:
 
 ![example](./image/README/UpdateEmploymentExample.png)
+
+See more examples, blueprints in our guide [here](https://docs.blackbird.io/eggs/remote/).
 
 ### Invoices
 
