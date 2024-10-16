@@ -27,6 +27,9 @@ public class SearchInvoicesRequest
     [Display("Due date to"), JsonProperty("due_date_to")]
     public DateTime? DueDateTo { get; set; }
 
+    [Display("Employment ID"), JsonProperty("employment_id")]
+    public string? EmploymentId { get; set; }
+
     [Display("Approved date from", Description = "Filters contractor invoices by approved date greater than or equal to the value"), JsonProperty("approved_date_from")]
     public DateTime? ApprovedDateFrom { get; set; }
 

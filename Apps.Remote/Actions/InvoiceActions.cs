@@ -36,6 +36,12 @@ public class InvoiceActions(InvocationContext invocationContext) : AppInvocable(
 
             currentPage++;
         } while (currentPage <= invoiceResponse.TotalPages);
+        
+        if(request.EmploymentId != null)
+        {
+            // Since the API does not support filtering by Employment ID, we need to filter the results manually (https://developer.remote.com/reference/get_index_contractor_invoice-1)
+            allInvoices = allInvoices.Where(i => i.EmploymentId == request.EmploymentId).ToList();
+        }
 
         return new InvoicesResponse
         {

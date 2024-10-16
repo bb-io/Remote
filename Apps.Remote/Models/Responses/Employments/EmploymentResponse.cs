@@ -33,6 +33,12 @@ public class EmploymentResponse
     [Display("Pricing plan details"), JsonProperty("pricing_plan_details")]
     public PricingPlanDetailsResponse PricingPlanDetails { get; set; } = new();
 
+    [Display("External ID"), JsonProperty("external_id")]
+    public string ExternalId { get; set; } = string.Empty;
+
+    [Display("Short ID"), JsonProperty("short_id")]
+    public string ShortId { get; set; } = string.Empty;
+
     [JsonProperty("contract_details"), DefinitionIgnore]
     public JObject? ContractDetails { get; set; }
 

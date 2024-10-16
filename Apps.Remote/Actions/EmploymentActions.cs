@@ -87,6 +87,11 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             { "country_code", request.CountryCode },
             { "type", string.IsNullOrEmpty(request.Type) ? "employee" : request.Type }
         };
+        
+        if(!string.IsNullOrEmpty(request.ExternalId))
+        {
+            body.Add("external_id", request.ExternalId);
+        }
 
         if (!string.IsNullOrEmpty(request.CompanyId))
         {
