@@ -48,7 +48,10 @@ public class EmploymentResponse
     public void SetContractDetails()
     {
         ContractDetailsResponse = ContractDetails?.ToObject<ContractDetailsResponse>()!;
-        ContractDetailsResponse.Fields = ContractDetails?.ToString()!;
+        if (ContractDetails != null)
+        {
+            ContractDetailsResponse.Fields = ContractDetails.ToString();
+        }
     }
 }
 
