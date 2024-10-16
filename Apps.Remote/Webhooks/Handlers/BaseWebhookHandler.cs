@@ -1,14 +1,16 @@
 using Apps.Remote.Api;
 using Apps.Remote.Models.Dtos;
 using Apps.Remote.Webhooks.Models;
+using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 
 namespace Apps.Remote.Webhooks.Handlers;
 
-public class BaseWebhookHandler(string subscribeEvent) : IWebhookEventHandler
+public class BaseWebhookHandler(InvocationContext invocationContext, string subscribeEvent) : BaseInvocable(invocationContext), IWebhookEventHandler
 {
     public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
     {
