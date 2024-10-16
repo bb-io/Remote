@@ -31,4 +31,7 @@ public class CreateEmploymentRequest
     
     [Display("Company ID")]
     public string? CompanyId { get; set; } = string.Empty;
+    
+    [Display("External ID")]
+    public string? ExternalId { get; set; } = string.Empty;
 }

@@ -29,6 +29,9 @@ public class InvoiceResponse
     [Display("Invoice ID"), JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
+    [Display("Employment ID"), JsonProperty("employment_id")]
+    public string EmploymentId { get; set; } = string.Empty;
+
     [Display("Items"), JsonProperty("items")]
     public List<InvoiceItemResponse> Items { get; set; } = new();
     

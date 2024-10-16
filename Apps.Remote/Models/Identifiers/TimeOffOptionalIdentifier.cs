@@ -4,9 +4,9 @@ using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Remote.Models.Identifiers;
 
-public class TimeOffIdentifier
+public class TimeOffOptionalIdentifier
 {
     [Display("Time off ID")]
     [DataSource(typeof(TimeOffDataSourceHandler))]
-    public string TimeOffId { get; set; } = string.Empty;
+    public string? TimeOffId { get; set; }
 }

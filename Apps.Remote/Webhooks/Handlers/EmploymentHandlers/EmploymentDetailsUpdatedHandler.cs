@@ -1,4 +1,6 @@
+using Blackbird.Applications.Sdk.Common.Invocation;
+
 namespace Apps.Remote.Webhooks.Handlers.EmploymentHandlers;
 
-public class EmploymentDetailsUpdatedHandler() : BaseWebhookHandler("employment.details.updated")
+public class EmploymentDetailsUpdatedHandler(InvocationContext invocationContext) : BaseWebhookHandler(invocationContext, "employment.details.updated")
 { }

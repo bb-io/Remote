@@ -2,6 +2,7 @@ using Apps.Remote.Api;
 using Apps.Remote.Constants;
 using Apps.Remote.Invocables;
 using Apps.Remote.Models.Dtos;
+using Apps.Remote.Models.Identifiers;
 using Apps.Remote.Models.Responses.CustomFields;
 using Apps.Remote.Webhooks.Handlers;
 using Apps.Remote.Webhooks.Payload;
@@ -18,7 +19,8 @@ public class Webhooks(InvocationContext invocationContext) : AppInvocable(invoca
     [Webhook("On custom field value updated", typeof(CustomFieldValueUpdatedHandler),
         Description = "This event is triggered whenever a custom field value is updated")]
     public async Task<WebhookResponse<CustomFieldValueResponse>> OnCustomFieldValueUpdated(
-        WebhookRequest webhookRequest)
+        WebhookRequest webhookRequest,
+        [WebhookParameter] CustomFieldOptionalIdentifier optionalIdentifier)
     {
         var payload = webhookRequest.Body.ToString()!;
         if (string.IsNullOrEmpty(payload))
@@ -28,6 +30,15 @@ public class Webhooks(InvocationContext invocationContext) : AppInvocable(invoca
 
         var customFieldValuePayload = JsonConvert.DeserializeObject<CustomFieldValuePayload>(payload, JsonConfig.JsonSettings) ??
                                       throw new Exception($"Failed to deserialize payload: {payload}");
+        
+        if(optionalIdentifier.CustomFieldId != null && optionalIdentifier.CustomFieldId != customFieldValuePayload.CustomFieldId)
+        {
+            return new WebhookResponse<CustomFieldValueResponse>
+            {
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
 
         var endpoint =
             $"/v1/custom-fields/{customFieldValuePayload.CustomFieldId}/values/{customFieldValuePayload.EmploymentId}";
