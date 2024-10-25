@@ -77,6 +77,27 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         return response.Data?.CustomFieldValue ?? new CustomFieldValueResponse()
             { CustomFieldId = customFieldIdentifier.CustomFieldId, Value = string.Empty };
     }
+    
+    [Action("Update employment custom field", Description = "Update employment custom field value by ID")]
+    public async Task<CustomFieldValueResponse> UpdateEmploymentCustomFieldValue(
+        [ActionParameter] CustomFieldIdentifier customFieldIdentifier,
+        [ActionParameter] EmploymentIdentifier employmentIdentifier,
+        [ActionParameter] UpdateCustomFieldValueRequest request)
+    {
+        var body = new Dictionary<string, object>
+        {
+            { "value", request.Value }
+        };
+
+        var apiRequest = new ApiRequest(
+                $"/v1/custom-fields/{customFieldIdentifier.CustomFieldId}/values/{employmentIdentifier.EmploymentId}",
+                Method.Patch, Creds)
+            .WithJsonBody(body);
+
+        var response = await Client.ExecuteWithErrorHandling<BaseDto<CustomFieldDto>>(apiRequest);
+        return response.Data?.CustomFieldValue ?? new CustomFieldValueResponse()
+            { CustomFieldId = customFieldIdentifier.CustomFieldId, Value = string.Empty };
+    }
 
     [Action("Create employment", Description = "Create employment with specified data")]
     public async Task<EmploymentResponse> CreateEmployment([ActionParameter] CreateEmploymentRequest request)
