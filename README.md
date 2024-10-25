@@ -38,6 +38,7 @@ Before you can connect you need to make sure that:
 - **Create employment** Create employment with specified data.
 - **Invite employment** Invite employment by ID to start the self-enrollment.
 - **Get employment custom field** Get employment custom field value by ID.
+- **Update employment custom field** Update employment custom field value by ID with specified data.
 - **Update employment** Update employment by ID with specified data. This action allows you to update employment details by ID with the provided data. When working with contract details, please note that the required properties can vary based on the employee's country.
 
 Steps:
