@@ -3,6 +3,7 @@ using Apps.Remote.Invocables;
 using Apps.Remote.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Remote.DataSourceHandlers;
@@ -15,7 +16,7 @@ public class ReceiptDataSource(InvocationContext invocationContext, [ActionParam
     {
         if (string.IsNullOrEmpty(identifier.ExpenseId))
         {
-            throw new InvalidOperationException("You should provide an Expense ID first.");
+            throw new PluginMisconfigurationException("You should provide an Expense ID first.");
         }
         
         var expenseActions = new ExpenseActions(InvocationContext, null!);

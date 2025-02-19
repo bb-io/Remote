@@ -5,6 +5,7 @@ using Apps.Remote.Models.Requests.Employments;
 using Apps.Remote.Models.Responses.Schemas;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Newtonsoft.Json;
 using RestSharp;
@@ -21,7 +22,7 @@ public class ContractDetailsValuesDataSource(
     {
         if (string.IsNullOrEmpty(updateRequest.CountryCode))
         {
-            throw new InvalidOperationException("You should provide a country code first");
+            throw new PluginMisconfigurationException("You should provide a country code first");
         }
 
         var request = new ApiRequest($"/v1/countries/{updateRequest.CountryCode}/contract_details", Method.Get, Creds);
@@ -33,7 +34,7 @@ public class ContractDetailsValuesDataSource(
             var lastKey = updateRequest.ContractDetailsKeys?.LastOrDefault();
             if (lastKey == null)
             {
-                throw new InvalidOperationException("Contract details keys must not be null");
+                throw new PluginMisconfigurationException("Contract details keys must not be null");
             }
 
             var key = lastKey.Substring(lastKey.LastIndexOf(']') + 1);
@@ -41,11 +42,11 @@ public class ContractDetailsValuesDataSource(
 
             if (property == null)
             {
-                throw new InvalidOperationException($"Property {key} not found in the schema");
+                throw new PluginMisconfigurationException($"Property {key} not found in the schema");
             }
 
             var jOneOf = property["oneOf"]
-                         ?? throw new InvalidOperationException("This property does not have dropdown values");
+                         ?? throw new PluginMisconfigurationException("This property does not have dropdown values");
             var values = JsonConvert.DeserializeObject<List<OneOfDto>>(jOneOf.ToString())!;
 
             return values.Where(x =>
@@ -54,6 +55,6 @@ public class ContractDetailsValuesDataSource(
                 .ToDictionary(x => x.Constant, x => x.Title);
         }
 
-        throw new InvalidOperationException("Properties not found in the schema");
+        throw new PluginMisconfigurationException("Properties not found in the schema");
     }
 }

@@ -4,6 +4,7 @@ using Apps.Remote.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Remote.Models.Requests.Employments;
 
@@ -41,7 +42,7 @@ public class UpdateEmploymentRequest : CountryIdentifier
         
         if(ContractDetailsKeys?.Count() != ContractDetailsValues?.Count())
         {
-            throw new ArgumentException("Contract details keys and values must have the same length");
+            throw new PluginMisconfigurationException("Contract details keys and values must have the same length");
         }
         
         if (ContractDetailsKeys != null && ContractDetailsValues != null)
@@ -53,7 +54,7 @@ public class UpdateEmploymentRequest : CountryIdentifier
         }
         else
         {
-            throw new ArgumentException("Contract details keys and values must not be null");
+            throw new PluginMisconfigurationException("Contract details keys and values must not be null");
         }
 
         return contractDetails;

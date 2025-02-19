@@ -6,6 +6,7 @@ using Apps.Remote.Models.Identifiers;
 using Apps.Remote.Models.Responses.Schemas;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -22,7 +23,7 @@ public class ContractDetailsKeysDataSource(
     {
         if (string.IsNullOrEmpty(identifier.CountryCode))
         {
-            throw new InvalidOperationException("You should provide a country code first");
+            throw new PluginMisconfigurationException("You should provide a country code first");
         }
 
         var request = new ApiRequest($"/v1/countries/{identifier.CountryCode}/contract_details", Method.Get, Creds);

@@ -15,6 +15,7 @@ using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Newtonsoft.Json;
 using RestSharp;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Remote.Actions;
 
@@ -79,7 +80,7 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         [ActionParameter] CreateInvoiceScheduleRequest request)
     {
         if (request.Amounts.Count != request.Descriptions.Count)
-            throw new ArgumentException("Amounts and Descriptions must have the same number of elements");
+            throw new PluginMisconfigurationException("Amounts and Descriptions must have the same number of elements");
 
         var body = new
         {
@@ -133,14 +134,14 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
         var startDate = request.StartDate ?? invoiceToImport.InvoiceDate;
         if (startDate < DateTime.Now)
         {
-            throw new ArgumentException($"Start date must be in the future. But was {startDate}");
+            throw new PluginMisconfigurationException($"Start date must be in the future. But was {startDate}");
         }
 
         var amounts = invoiceToImport.Lines.Select(line => line.Amount).ToList();
         var sum = amounts.Sum();
         if (sum < 100)
         {
-            throw new ArgumentException("Sum of amounts must be greater than 100");
+            throw new PluginMisconfigurationException("Sum of amounts must be greater than 100");
         }
 
         amounts = amounts.Select(amount => amount * 100).ToList();
@@ -170,12 +171,12 @@ public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileM
             && request.Amounts == null && request.Descriptions == null && request.Note == null &&
             request.NrOccurrences == null)
         {
-            throw new ArgumentException("At least one field must be specified for update");
+            throw new PluginMisconfigurationException("At least one field must be specified for update");
         }
 
         if (request.Amounts?.Count != request.Descriptions?.Count)
         {
-            throw new ArgumentException("Amounts and Descriptions must have the same number of elements");
+            throw new PluginMisconfigurationException("Amounts and Descriptions must have the same number of elements");
         }
 
         var items = request.Amounts?.Select((amount, index) => new

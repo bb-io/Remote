@@ -7,6 +7,7 @@ using Apps.Remote.Models.Requests.TimeOffs;
 using Apps.Remote.Models.Responses.TimeOffs;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
@@ -37,7 +38,7 @@ public class TimeOffActions(InvocationContext invocationContext) : AppInvocable(
     public async Task<TimeOffResponse> CreateTimeOff([ActionParameter] CreateTimeOffInput input)
     {
         if (input.StartDate > input.EndDate)
-            throw new("End date should be greater than Start date");
+            throw new PluginMisconfigurationException("End date should be greater than Start date");
 
         var apiRequest = new ApiRequest("/v1/timeoff", Method.Post, Creds)
             .WithJsonBody(new CreateTimeOffRequest(input), JsonConfig.JsonSettings);

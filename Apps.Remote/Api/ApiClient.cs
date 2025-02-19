@@ -3,6 +3,7 @@ using Apps.Remote.Models.Dtos;
 using Apps.Remote.Models.Responses;
 using Apps.Remote.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.RestSharp;
 using Newtonsoft.Json;
@@ -128,6 +129,6 @@ public class ApiClient(IEnumerable<AuthenticationCredentialsProvider> creds)
             errorMessage += $"Content: {response.Content}";
         }
 
-        return new Exception(errorMessage.Trim());
+        return new PluginApplicationException(errorMessage.Trim());
     }
 }
