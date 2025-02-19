@@ -13,6 +13,7 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Remote.Actions;
 
@@ -77,7 +78,7 @@ public class ExpenseActions(InvocationContext invocationContext, IFileManagement
     {
         var expense = await GetExpense(identifier);
         var receipt = expense.Receipts.FirstOrDefault(r => r.Id == identifier.ReceiptId)
-            ?? throw new InvalidOperationException("Receipt not found in the expense object.");
+            ?? throw new PluginMisconfigurationException("Receipt not found in the expense object.");
         
         var apiRequest = new ApiRequest($"/v1/expenses/{identifier.ExpenseId}/receipts/{identifier.ReceiptId}", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling(apiRequest);

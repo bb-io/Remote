@@ -5,12 +5,6 @@ namespace Apps.Remote;
 
 public class Application : IApplication, ICategoryProvider
 {
-    public string Name
-    {
-        get => "Remote";
-        set { }
-    }
-
     public T GetInstance<T>()
     {
         throw new NotImplementedException();
