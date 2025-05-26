@@ -35,7 +35,12 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
 
             if (employmentsResponse.Employments != null)
             {
-                allEmployments.AddRange(employmentsResponse.Employments);
+                var pageItems = string.IsNullOrEmpty(request.ShortId)
+                        ? employmentsResponse.Employments
+                        : employmentsResponse.Employments
+                            .Where(e => e.ShortId == request.ShortId)
+                            .ToList();
+                allEmployments.AddRange(pageItems);
             }
 
             currentPage++;
@@ -49,6 +54,34 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             Employments = allEmployments
         };
     }
+
+    [Action("Find employment", Description = "Find the first employment matching specified criteria")]
+    public async Task<EmploymentResponse?> FindEmployment([ActionParameter] SearchEmploymentsRequest request)
+    {
+        var currentPage = 1;
+        EmploymentsResponse? pageData;
+
+        do
+        {
+            var apiRequest = CreateApiRequest(request, currentPage, PageSize);
+            var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentsResponse>>(apiRequest);
+            pageData = response.Data;
+
+            if (pageData?.Employments != null)
+            {
+                var match = pageData.Employments
+                    .FirstOrDefault(e => e.ShortId == request.ShortId);
+                if (match != null)
+                    return match;
+            }
+
+            currentPage++;
+        }
+        while (pageData != null && currentPage <= pageData.TotalPages);
+
+        return null;
+    }
+
 
     [Action("Get employment", Description = "Get employment by ID")]
     public async Task<EmploymentResponse> GetEmployment([ActionParameter] EmploymentIdentifier identifier)
@@ -254,6 +287,7 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         var apiRequest = new ApiRequest($"/v1/employments/{identifier.EmploymentId}/invite", Method.Post, Creds);
         await Client.ExecuteWithErrorHandling(apiRequest);
     }
+
 
     private ApiRequest CreateApiRequest(SearchEmploymentsRequest request, int currentPage, int pageSize)
     {

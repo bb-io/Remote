@@ -1,6 +1,8 @@
+using Apps.Remote.DataSourceHandlers;
 using Apps.Remote.DataSourceHandlers.Static;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Remote.Models.Requests.Employments;
 
@@ -13,4 +15,8 @@ public class SearchEmploymentsRequest
 
     [StaticDataSource(typeof(EmploymentStatusDataSource))]
     public string? Status { get; set; }
+
+    [Display("Short ID")]
+    [DataSource(typeof(EmploymentShortIdDataSource))]
+    public string? ShortId { get; set; }
 }
