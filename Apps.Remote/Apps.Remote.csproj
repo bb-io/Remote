@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <Product>Remote</Product>
         <Description>Remote is a Global HR Platform that helps companies hire, manage, and pay their entire team — and more effectively compete in the modern global economy through our comprehensive set of core solutions including, HRIS, payroll, international employment, contractor management, and more.</Description>
-        <Version>1.0.10</Version>
+        <Version>1.0.11</Version>
         <AssemblyName>Apps.Remote</AssemblyName>
         <RootNamespace>Apps.Remote</RootNamespace>
         <PackageId>Apps.Remote</PackageId>
