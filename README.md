@@ -66,7 +66,7 @@ See more examples, blueprints in our guide [here](https://docs.blackbird.io/eggs
 - **Update invoice schedule** Update сontractor invoice schedule by ID with specified data.
 - **Import invoice schedule** Import сontractor invoice schedules from a JSON file. You can export this file from the `Plunet` app for example.
 
-The Remote API processes amounts in cents rather than in the standard currency format. This means that any amount returned by the API will be in cents. For example, an amount of $800 will be represented as 80,000 cents in the API outputs.
+> **Note**: The Remote API processes amounts **in cents** rather than in the standard currency format. This means that any amount input or returned by the API will be in cents. For example, an amount of $800 will be represented as 80,000 cents in the API outputs.
 
 
 ### Time offs
