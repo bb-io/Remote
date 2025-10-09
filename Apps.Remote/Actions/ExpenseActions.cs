@@ -17,7 +17,7 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Remote.Actions;
 
-[ActionList]
+[ActionList("Expenses")]
 public class ExpenseActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : AppInvocable(invocationContext)
 {
     private const int PageSize = 50;

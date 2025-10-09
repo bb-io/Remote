@@ -19,7 +19,7 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Remote.Actions;
 
-[ActionList]
+[ActionList("Invoice schedules")]
 public class InvoiceSchedulesActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : AppInvocable(invocationContext)
 {

@@ -15,7 +15,7 @@ using RestSharp;
 
 namespace Apps.Remote.Actions;
 
-[ActionList]
+[ActionList("Employment")]
 public class EmploymentActions(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     private const int PageSize = 50;
@@ -81,7 +81,6 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
 
         return null;
     }
-
 
     [Action("Get employment", Description = "Get employment by ID")]
     public async Task<EmploymentResponse> GetEmployment([ActionParameter] EmploymentIdentifier identifier)

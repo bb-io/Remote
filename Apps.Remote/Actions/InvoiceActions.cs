@@ -11,7 +11,7 @@ using RestSharp;
 
 namespace Apps.Remote.Actions;
 
-[ActionList]
+[ActionList("Invoices")]
 public class InvoiceActions(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     private const int DefaultPageSize = 50;
