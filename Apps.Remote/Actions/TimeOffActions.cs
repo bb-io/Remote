@@ -14,7 +14,7 @@ using RestSharp;
 
 namespace Apps.Remote.Actions;
 
-[ActionList]
+[ActionList("Time off")]
 public class TimeOffActions(InvocationContext invocationContext) : AppInvocable(invocationContext)
 {
     [Action("Get time off", Description = "Get details of a specific time off")]
