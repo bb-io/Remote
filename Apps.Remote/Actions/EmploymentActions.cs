@@ -157,7 +157,9 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
             { "job_title", request.JobTitle },
             { "name", request.Name },
             { "provisional_start_date", request.ProvisionalStartDate.ToString("yyyy-MM-dd") },
-            { "has_seniority_date", hasSeniorityDate ? "yes" : "no" }
+            { "has_seniority_date", hasSeniorityDate ? "yes" : "no" },
+            { "tax_servicing_countries", Array.Empty<string>() },
+            { "tax_job_category", request.TaxJobCategory ?? null! }
         };
 
         if (hasSeniorityDate)

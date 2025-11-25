@@ -1,5 +1,6 @@
 ﻿using Apps.Remote.Actions;
 using Apps.Remote.Models.Requests.Employments;
+using Newtonsoft.Json;
 using Remote.Base;
 
 namespace Tests.Remote
@@ -23,7 +24,6 @@ namespace Tests.Remote
             Assert.IsNotNull(response);
         }
 
-
         [TestMethod]
         public async Task Find_employments_ReturnsResponse()
         {
@@ -37,5 +37,28 @@ namespace Tests.Remote
             Assert.IsNotNull(response);
         }
 
+        [TestMethod]
+        public async Task CreateEmployment_ReturnsResponse()
+        {
+            // Arrange
+            var action = new EmploymentActions(InvocationContext);
+            var request = new CreateEmploymentRequest
+            { 
+                Email = "testemail@email.com",
+                JobTitle = "test job title from BB tests",
+                Name = "test name",
+                ProvisionalStartDate = DateTime.Now + TimeSpan.FromDays(21),
+                CountryCode = "TZA",
+                Type = "employee",
+                TaxJobCategory = "finance"
+            };
+
+            // Act
+            var result = await action.CreateEmployment(request);
+
+            // Assert
+            Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+            Assert.IsNotNull(result);
+        }
     }
 }

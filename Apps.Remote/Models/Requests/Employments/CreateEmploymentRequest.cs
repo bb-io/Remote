@@ -34,4 +34,7 @@ public class CreateEmploymentRequest
     
     [Display("External ID")]
     public string? ExternalId { get; set; } = string.Empty;
+
+    [Display("Job category", Description = ""), StaticDataSource(typeof(JobCategoryDataSource))]
+    public string? TaxJobCategory { get; set; }
 }

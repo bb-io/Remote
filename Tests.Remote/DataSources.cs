@@ -33,5 +33,17 @@ namespace Tests.Remote
             Assert.IsNotNull(result);
         }
 
+        [TestMethod]
+        public async Task CountryDataSource_ReturnsCountryCodes()
+        {
+            var handler = new CountryDataSource(InvocationContext);
+            var result = await handler.GetDataAsync(new DataSourceContext { SearchString = "" }, CancellationToken.None);
+
+            foreach (var item in result)
+            {
+                Console.WriteLine($"Id: {item.Key}, Name: {item.Value}");
+            }
+            Assert.IsNotNull(result);
+        }
     }
 }
