@@ -134,40 +134,42 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
     [Action("Create employment", Description = "Create employment with specified data")]
     public async Task<EmploymentResponse> CreateEmployment([ActionParameter] CreateEmploymentRequest request)
     {
-        var hasSeniorityDate = request.SeniorityDate.HasValue;
-        var body = new Dictionary<string, object>()
-        {
-            { "country_code", request.CountryCode },
-            { "type", string.IsNullOrEmpty(request.Type) ? "employee" : request.Type }
-        };
-        
-        if(!string.IsNullOrEmpty(request.ExternalId))
-        {
-            body.Add("external_id", request.ExternalId);
-        }
+        var type = string.IsNullOrWhiteSpace(request.Type)
+              ? "employee"
+              : request.Type.Trim().ToLowerInvariant();
 
-        if (!string.IsNullOrEmpty(request.CompanyId))
+        var body = new Dictionary<string, object?>()
         {
-            body.Add("company_id", request.CompanyId);
-        }
-
-        var basicInformation = new Dictionary<string, object>
-        {
-            { "email", request.Email },
-            { "job_title", request.JobTitle },
-            { "name", request.Name },
-            { "provisional_start_date", request.ProvisionalStartDate.ToString("yyyy-MM-dd") },
-            { "has_seniority_date", hasSeniorityDate ? "yes" : "no" },
-            { "tax_servicing_countries", Array.Empty<string>() },
-            { "tax_job_category", request.TaxJobCategory ?? null! }
+            ["country_code"] = request.CountryCode,
+            ["type"] = type
         };
 
-        if (hasSeniorityDate)
+        if (!string.IsNullOrWhiteSpace(request.ExternalId))
+            body["external_id"] = request.ExternalId;
+
+        if (!string.IsNullOrWhiteSpace(request.CompanyId))
+            body["company_id"] = request.CompanyId;
+
+        var basicInformation = new Dictionary<string, object?>()
         {
-            basicInformation.Add("seniority_date", request.SeniorityDate!.Value.ToString("yyyy-MM-dd"));
+            ["email"] = request.Email,
+            ["job_title"] = request.JobTitle,
+            ["name"] = request.Name,
+            ["provisional_start_date"] = request.ProvisionalStartDate.ToString("yyyy-MM-dd")
+        };
+
+        if (type == "employee" && request.SeniorityDate.HasValue)
+        {
+            basicInformation["has_seniority_date"] = "yes";
+            basicInformation["seniority_date"] = request.SeniorityDate.Value.ToString("yyyy-MM-dd");
         }
 
-        body.Add("basic_information", basicInformation);
+        if (type == "employee" && !string.IsNullOrWhiteSpace(request.TaxJobCategory))
+        {
+            basicInformation["tax_job_category"] = request.TaxJobCategory;
+        }
+
+        body["basic_information"] = basicInformation;
 
         var apiRequest = new ApiRequest("/v1/employments", Method.Post, Creds)
             .WithJsonBody(body);
@@ -175,7 +177,10 @@ public class EmploymentActions(InvocationContext invocationContext) : AppInvocab
         var response = await Client.ExecuteWithErrorHandling<BaseDto<EmploymentDto>>(apiRequest);
 
         await Task.Delay(1500);
-        return await GetEmployment(new EmploymentIdentifier { EmploymentId = response.Data?.Employment!.Id! });
+        return await GetEmployment(new EmploymentIdentifier
+        {
+            EmploymentId = response.Data?.Employment!.Id!
+        });
     }
 
     [Action("Update employment", Description = "Update employment by ID with specified data")]
