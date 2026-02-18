@@ -6,7 +6,7 @@ namespace Apps.Remote.Models.Dtos;
 public class BasePaginationResponse
 {
     [DefinitionIgnore, JsonProperty("total_count")]
-    public int TotalCount { get; set; }
+    public double TotalCount { get; set; }
 
     [DefinitionIgnore, JsonProperty("current_page")]
     public int CurrentPage { get; set; }
